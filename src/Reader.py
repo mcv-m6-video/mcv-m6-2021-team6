@@ -2,6 +2,7 @@ import os
 import xml.etree.ElementTree as ET
 from collections import OrderedDict, defaultdict
 from BoundingBox import *
+import xmltodict
 
 class Reader:
     def __init__(self, path, classes, sortStrategy):
@@ -11,30 +12,31 @@ class Reader:
 
     def get_annotations(self):
 
-        tree = ET.parse(self.path+"ai_challenge_s03_c010-full_annotation.xml")
 
-        root = tree.getroot()
+        with open(self.path+"ai_challenge_s03_c010-full_annotation.xml") as f:
+            tracks = xmltodict.parse(f.read())['annotations']['track']
 
-        groundTruth = defaultdict()
-        for child in root[2:]:
-            if child.attrib['label'] in self.classes:
-                for c in child:
-                    frameNumber = int(c.attrib['frame'])
-                    lista = [child.attrib['label'],
-                             float(c.attrib['xtl']),
-                             float(c.attrib['ytl']),
-                             float(c.attrib['xbr']),
-                             float(c.attrib['ybr'])]
-                    if(frameNumber in groundTruth.keys()):
-                        groundTruth[frameNumber].append(lista)
-                    else:
-                        groundTruth[frameNumber] = [lista]
+        annotations = []
+        for track in tracks:
+            id = track['@id']
+            label = track['@label']
 
-        orderedDict = OrderedDict(groundTruth)
+            if label != 'car':
+                continue
 
-        if self.sortStrategy == "perFrame":
-            return sorted(orderedDict.items())
-        return orderedDict
+            for box in track['box']:
+                annotations.append(BoundingBox(
+                    id=int(id),
+                    label=label,
+                    frame=int(box['@frame']),
+                    xtl=float(box['@xtl']),
+                    ytl=float(box['@ytl']),
+                    xbr=float(box['@xbr']),
+                    ybr=float(box['@ybr'])
+                ))
+
+
+        return annotations
 
 
 
@@ -60,7 +62,7 @@ class Reader:
                 ytl=float(data[3]),
                 xbr=float(data[2]) + float(data[4]),
                 ybr=float(data[3]) + float(data[5]),
-                score=float(data[6])
+                confidence=float(data[6])
             ))
 
         return annotations

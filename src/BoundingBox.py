@@ -1,6 +1,6 @@
 class BoundingBox:
 
-    def __init__(self, frame, id, label, xtl, ytl, xbr, ybr, score=None, parked=None):
+    def __init__(self, frame, id, label, xtl, ytl, xbr, ybr, confidence = 0):
         self.frame = frame
         self.id = id
         self.label = label
@@ -8,8 +8,7 @@ class BoundingBox:
         self.ytl = ytl
         self.xbr = xbr
         self.ybr = ybr
-        self.score = score
-        self.parked = parked
+        self.confidence = confidence
 
     @property
     def bbox(self):
@@ -32,4 +31,4 @@ class BoundingBox:
         return (int((self.xtl + self.xbr) / 2), int((self.ytl + self.ybr) / 2))
 
     def __str__(self):
-        return f'frame={self.frame}, id={self.id}, label={self.label}, bbox={self.bbox}, confidence={self.score}, parked={self.parked}'
+        return f'frame={self.frame}, id={self.id}, label={self.label}, bbox={self.bbox}, confidence={self.confidendce}'
