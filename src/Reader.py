@@ -12,8 +12,8 @@ class Reader:
 
     def get_annotations(self):
 
-
-        with open(self.path+"ai_challenge_s03_c010-full_annotation.xml") as f:
+        abs_path_to_xml = os.path.abspath(self.path+"/AICity_data/train/S03/c010/Anotation_40secs_AICITY_S03_C010.xml")
+        with open(abs_path_to_xml) as f:
             tracks = xmltodict.parse(f.read())['annotations']['track']
 
         annotations = []

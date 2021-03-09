@@ -3,8 +3,9 @@ import glob
 import os
 from Reader import *
 from Adapted_voc_evaluation import  *
-PATH_DATASET = '../datasets/AICity_data/'
-PATH_RESULTS = './Results/'
+SELF_PATH = os.getcwd()
+PATH_DATASET = os.path.normpath(os.path.join(os.path.dirname(__file__), '../datasets'))
+PATH_RESULTS = os.path.normpath(os.path.join(os.path.dirname(__file__), '../Results'))
 
 def task1_1(show):
     reader = Reader(PATH_DATASET, ['car'], "perFrame")
@@ -20,7 +21,7 @@ def task1_1(show):
     # if we want to replicate results
     # np.random.seed(10)
 
-    cap = cv2.VideoCapture("../datasets/AICity_data/train/S03/c010/vdo.avi")
+    cap = cv2.VideoCapture(PATH_DATASET+"/AICity_data/train/S03/c010/vdo.avi")
     # cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id)  # to start from frame #frame_id
     num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
