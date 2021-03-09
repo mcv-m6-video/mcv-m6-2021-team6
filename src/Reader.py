@@ -20,11 +20,16 @@ class Reader:
             if child.attrib['label'] in self.classes:
                 for c in child:
                     frameNumber = int(c.attrib['frame'])
-                    lista = [float(c.attrib['xtl']),
+                    lista = [child.attrib['label'],
+                             float(c.attrib['xtl']),
                              float(c.attrib['ytl']),
                              float(c.attrib['xbr']),
                              float(c.attrib['ybr'])]
-                    groundTruth[frameNumber] = lista
+                    if(frameNumber in groundTruth.keys()):
+                        groundTruth[frameNumber].append(lista)
+                    else:
+                        groundTruth[frameNumber] = [lista]
+
         orderedDict = OrderedDict(groundTruth)
 
         if self.sortStrategy == "perFrame":
