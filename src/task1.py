@@ -1,6 +1,4 @@
 import cv2
-import glob
-import os
 from Reader import *
 from Adapted_voc_evaluation import  *
 SELF_PATH = os.getcwd()
@@ -17,17 +15,14 @@ def task1_1(show):
         grouped[box.frame].append(box)
     ordered_gt= OrderedDict(sorted(grouped.items()))
 
-
     # if we want to replicate results
     # np.random.seed(10)
 
     cap = cv2.VideoCapture(PATH_DATASET+"/AICity_data/train/S03/c010/vdo.avi")
     # cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id)  # to start from frame #frame_id
+
     num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    #if noise_params['add']:
-    #    noisy_gt = add_noise(gt, noise_params, num_frames)
-    #    grouped_noisy_gt = group_by_frame(noisy_gt)
 
     for frame_id in range(num_frames):
         _, frame = cap.read()
@@ -38,11 +33,8 @@ def task1_1(show):
         if show == 'det':
             frame = draw_boxes(frame,[(i) for i in det if i.frame == frame_id], det=True)
 
-        #if show['noisy']:
-        #    frame = draw_boxes(frame, frame_id, grouped_noisy_gt[frame_id], color='r')
-
         cv2.imshow('frame', frame)
-        if cv2.waitKey() == 113:  # press q to quit
+        if cv2.waitKey() == 113:
             break
 
         frame_id += 1
@@ -74,5 +66,5 @@ def draw_boxes(image, boxes, det=False):
     return image
 
 if __name__ == '__main__':
-    #task1_1("gt")
+    task1_1("gt")
     task1_2()
