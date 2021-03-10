@@ -18,3 +18,10 @@
 - [x] T3.2 - PEPN
 - [x] T3.3 - Analysis & Visualizations
 - [x] T4   - Optical flow plot
+
+## Setting up environment
+
+`Python 3.7` + `TensorBoard 2.4` + `torch 0.8` + `openCV 4.1` + `detectron2 v0.3`
+You can find the full conda environment used in the Google Cloud instance in `requirements.txt`
+You can install it using: `conda install --file requirements.txt`
+It has been build & configured to allow SSH X11 forwarding & Detectron2
