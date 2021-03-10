@@ -16,5 +16,5 @@
 - [ ] T2   - Temporal Analysis of the Results
 - [x] T3.1 - MSEN
 - [x] T3.2 - PEPN
-- [ ] T3.3 - Analysis & Visualizations
-- [ ] T4   - Optical flow plot
+- [x] T3.3 - Analysis & Visualizations
+- [x] T4   - Optical flow plot
