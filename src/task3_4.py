@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from OpticalFlow import read_flow, optical_flow_magnitude_plot, msen_pepn
-from display import plt_flow_error, histogram_with_mean_plot
+from display import plt_flow_error, histogram_with_mean_plot, visualize_flow
 
 # Task 3: Optical flow evaluation metrics
 for frame_id in ['045', '157']:
@@ -19,3 +19,9 @@ for frame_id in ['045', '157']:
     histogram_with_mean_plot(title='Error Histogram', idx=frame_id, values=non_occ_err_flow, mean_value=msen)
     optical_flow_magnitude_plot(flow_predicted, frame_id, title="Predicted_Flow")
     optical_flow_magnitude_plot(flow_groundtruth, frame_id, title="GroundTruth_Flow")
+
+    
+# Task 4: Visualizing the optical flow
+    I = cv2.imread(os.path.join(f'./databases/Kitti/{filename}'))
+    visualize_flow(I, flow_predicted)
+    visualize_flow(I, flow_groundtruth, suffix="_groundtruth")
