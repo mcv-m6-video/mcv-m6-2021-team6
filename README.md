@@ -14,9 +14,7 @@
 - [ ] T1.1 - IoU & mAP for groundtruth + noise
 - [ ] T1.2 - mAP for provided object detections
 - [ ] T2   - Temporal Analysis of the Results
-- [ ] T3.1 - MSEN
-- [ ] T3.2 - PEPN
+- [x] T3.1 - MSEN
+- [x] T3.2 - PEPN
 - [ ] T3.3 - Analysis & Visualizations
 - [ ] T4   - Optical flow plot
-
-Slides Week 1: https://docs.google.com/presentation/d/1TL2WlbjHjC5AN4DS53GQjmir-HQMR6kTt75NfyJBAzU/edit?usp=sharing
