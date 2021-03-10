@@ -25,3 +25,14 @@ def histogram_with_mean_plot(title: str, idx: str, values: float, mean_value: fl
     plt.legend()
     plt.savefig(os.path.join(save_path, f'histogram_{idx}.png')) if save_path else plt.show()
     plt.close()
+
+def visualize_flow(I, flow, suffix=""):
+    resized = cv2.resize(I, (250, 80), interpolation=cv2.INTER_AREA)
+    mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
+    mag = mag[::5, ::5]
+    ang = ang[::5, ::5]
+    plt.figure()
+    plt.imshow(resized)
+    plt.title("Flow" + suffix)
+    plt.quiver(mag * np.cos(ang), mag * np.sin(ang))
+    plt.show()
