@@ -16,7 +16,7 @@ from docopt import docopt
 
 def task3(Method = 'KNN', Filter = False):
   kernel = np.ones((3, 3), np.uint8)
-  Video_Path = './vdo.avi'
+  Video_Path = '..data/vdo.avi'
 
   if Method == 'MOG2':
     backSub = cv2.createBackgroundSubtractorMOG2()
@@ -24,7 +24,7 @@ def task3(Method = 'KNN', Filter = False):
     backSub = cv2.createBackgroundSubtractorKNN()
 
   capture = cv2.VideoCapture(cv2.samples.findFileOrKeep(Video_Path))
-  roi = cv2.imread('./roi.jpg', cv2.IMREAD_GRAYSCALE)
+  roi = cv2.imread('..data/roi.jpg', cv2.IMREAD_GRAYSCALE)
   
   if not capture.isOpened():
     print('Unable to open: ' + Video_Path)
