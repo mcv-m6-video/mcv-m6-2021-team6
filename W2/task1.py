@@ -35,8 +35,6 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
                        int(video_n_frames * 0.25),
                        video_n_frames,
                        animation=False,
-                       denoise=False,
-                       adaptive=False,
                        color_space=color_space)
 
     reader = AnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')

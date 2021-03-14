@@ -80,8 +80,6 @@ def remove_bg(
         initial_frame,
         final_frame,
         animation=False,
-        denoise=False,
-        adaptive=True,
         rho=0.2,
         color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
 
@@ -109,15 +107,6 @@ def remove_bg(
             frame[frame != 255] = 0
 
         frame = np.ascontiguousarray(frame).astype("uint8")
-
-        if adaptive:
-            # Update mu and sigma if needed
-            mu[frame == 0] = rho * img[frame == 0] + (1 - rho) * mu[frame == 0]
-            sigma[frame == 0] = np.sqrt(
-                rho * np.power((img[frame == 0] - mu[frame == 0]), 2) + (1 - rho) * np.power(sigma[frame == 0], 2))
-
-        if denoise:
-            frame = denoise_bg(frame)
 
         if animation:
             frames[c, ...] = cv2.resize(frame, (sy, sx))
