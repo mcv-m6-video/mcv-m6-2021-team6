@@ -3,7 +3,6 @@ import os
 import glob
 import pickle as pkl
 import imageio
-from torch import unsqueeze
 import numpy as np
 from tqdm import tqdm
 from scipy import ndimage
@@ -92,12 +91,16 @@ def remove_bg(
 
         if i == initial_frame and animation:
             sx, sy = np.int(np.shape(img)[0] / 4), np.int(np.shape(img)[1] / 4)
-            frames = np.zeros((final_frame - initial_frame, sx, sy)).astype(np.uint8())
+            frames = np.zeros((final_frame - initial_frame, sx, sy))
+
 
         frame = np.zeros(np.shape(img))
+
         frame[np.abs(img - mu) >= alpha * (sigma + 2)] = 1
         frame[np.abs(img - mu) < alpha * (sigma + 2)] = 0
 
+        #cv2.imshow("s", frame)
+        #cv2.waitKey()
         if len(frame.shape) != 2:
 
             frame = frame[:, :, channels]
@@ -106,14 +109,20 @@ def remove_bg(
             frame[frame == max_v] = 255
             frame[frame != 255] = 0
 
-        frame = np.ascontiguousarray(frame).astype("uint8")
+        #frame = np.ascontiguousarray(frame).astype("uint8")
 
+
+        detected_bb += fg_segmentation_to_boxes(frame, i, img)
         if animation:
-            frames[c, ...] = cv2.resize(frame, (sy, sx))
+            #cv2.imshow("s", frame)
+            #cv2.waitKey()
+            rframe = cv2.resize(frame, (sy, sx))
 
+            frames[c, ...] = rframe
         c += 1
-        detected_bb += fg_segmentation_to_boxes(frame, i)
 
+    #cv2.imshow("s", frame)
+    #cv2.waitKey()
     if animation:
         frames_to_gif('bg_removal_a{}_p{}_{}.gif'.format(alpha, rho, color_space), frames)
 
@@ -143,16 +152,19 @@ def bg_estimation(mode, **kwargs):
     if mode == 'LSBP':
         return cv2.bgsegm.createBackgroundSubtractorLSBP()
 
-def fg_segmentation_to_boxes(frame, i, box_min_size=(10, 10), cls='car'):
+def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
     detections = []
-    _, contours, _ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    framee = np.ascontiguousarray(frame* 255).astype(np.uint8)
+    #cv2.imshow("ss", framee)
+    #cv2.waitKey()
+    _, contours,_ = cv2.findContours(framee, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     for contour in contours:
 
         (x, y, w, h) = cv2.boundingRect(contour)
         #if w > box_min_size[0] and h > box_min_size[1]:
         detections.append(BoundingBox(
                 frame=int(i),
-                id=int(i),
+                id=int(0),
                 label=cls,
                 xtl=float(x),
                 ytl=float(y),
@@ -162,11 +174,26 @@ def fg_segmentation_to_boxes(frame, i, box_min_size=(10, 10), cls='car'):
             )
           #  [i, cls, 0, x, y, x + w, y + h]
         )
+        xy, x2y2 = (int(float(x)), int(float(y))), (int(float(x+w)), int(float(y+h)))
+        color = (0, 255, 0)
+
+
+        cv2.rectangle(img, xy, x2y2, color, 3)
+        #print(xy)
+        #print(x2y2)
+
+    img= cv2.resize(img, (int(1920 / 2), int(1080 / 2)))
+
+    # Show result
+    cv2.imshow('gray', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     return detections
 
 def frames_to_gif(filename, frames):
-    frames = frames.astype('uint8')
+    #frames = frames.astype('uint8')
+
     imageio.mimsave(filename, frames)
 
 def animation_2bb(name, format, gt_bb, bb_cords, frame_path, fps=10, seconds=10, ini=0, width=480, height=270):

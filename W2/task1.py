@@ -1,7 +1,7 @@
 import matplotlib as plt
 from utilsw2 import *
 from Reader import *
-
+import cv2
 from Adapted_voc_evaluation import *
 path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
 path_to_frames = '../datasets/frames/'
@@ -30,20 +30,20 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
     aps7 = []
     det_bb = remove_bg(mu,
                        sigma,
-                       1,
+                       7,
                        path_to_frames,
                        int(video_n_frames * 0.25),
-                       video_n_frames,
-                       animation=False,
+                       int(video_n_frames * 0.25 + 100),
+                       animation=True,
                        color_space=color_space)
 
-    reader = AnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')
+    reader = AnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
     gt_bb = reader.get_bboxes_per_frame(classes=['car'])
 
-    ap, prec, rec = average_precision(gt_bb , det_bb)
-    print (ap)
-    print (prec)
-    print(rec)
+    #ap, prec, rec = average_precision(gt_bb , det_bb)
+    #print (ap)
+    #print (prec)
+    #print(rec)
     # ap = calculate_ap(det_bb, gt_bb, int(video_n_frames * 0.25), video_n_frames, mode='area')
     animation_2bb('try_dnoise', '.gif', gt_bb, det_bb, path_to_frames, 10, 10, int(video_n_frames * 0.25),
                   int(1920 / 4), int(1080 / 4))
