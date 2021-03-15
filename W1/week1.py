@@ -66,11 +66,11 @@ def task1_1(save_path=None):
 
 
 def task1_2():
-    reader = AICityChallengeAnnotationReader(path='../data/ai_challenge_s03_c010-full_annotation.xml')
+    reader = AICityChallengeAnnotationReader(path='../datasets/ai_challenge_s03_c010-full_annotation.xml')
     gt = reader.get_annotations(classes=['car'])
 
     for detector in ['mask_rcnn', 'ssd512', 'yolo3']:
-        reader = AICityChallengeAnnotationReader(path=f'../data/AICity_data/train/S03/c010/det/det_{detector}.txt')
+        reader = AICityChallengeAnnotationReader(path=f'../datasets/AICity_data/train/S03/c010/det/det_{detector}.txt')
         det = reader.get_annotations(classes=['car'])
 
         y_true = []
