@@ -30,23 +30,27 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
     aps7 = []
     det_bb = remove_bg(mu,
                        sigma,
-                       7,
+                       6,
                        path_to_frames,
                        int(video_n_frames * 0.25),
                        int(video_n_frames * 0.25 + 100),
                        animation=True,
                        color_space=color_space)
 
-    reader = AnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
+    reader = AnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml', initFrame=int(video_n_frames * 0.25), finalFrame=int(video_n_frames * 0.25 + 100))
     gt_bb = reader.get_bboxes_per_frame(classes=['car'])
+    bb_gt = []
+    # for frame in gt.keys():
+    for frame in range(int(video_n_frames * 0.25),  int(video_n_frames * 0.25 + 100)):
+        bb_gt.append(gt_bb[frame])
 
-    #ap, prec, rec = average_precision(gt_bb , det_bb)
-    #print (ap)
+    ap, prec, rec = mean_average_precision(bb_gt , det_bb)
+    print (ap)
     #print (prec)
     #print(rec)
     # ap = calculate_ap(det_bb, gt_bb, int(video_n_frames * 0.25), video_n_frames, mode='area')
-    animation_2bb('try_dnoise', '.gif', gt_bb, det_bb, path_to_frames, 10, 10, int(video_n_frames * 0.25),
-                  int(1920 / 4), int(1080 / 4))
+    #animation_2bb('try_dnoise', '.gif', gt_bb, det_bb, path_to_frames, 10, 10, int(video_n_frames * 0.25),
+    #              int(1920 / 4), int(1080 / 4))
 
 
     #plt.title('Median Filter')

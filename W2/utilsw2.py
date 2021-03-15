@@ -112,7 +112,7 @@ def remove_bg(
         #frame = np.ascontiguousarray(frame).astype("uint8")
 
 
-        detected_bb += fg_segmentation_to_boxes(frame, i, img)
+        detected_bb.append(fg_segmentation_to_boxes(frame, i, img))
         if animation:
             #cv2.imshow("s", frame)
             #cv2.waitKey()
@@ -153,43 +153,18 @@ def bg_estimation(mode, **kwargs):
         return cv2.bgsegm.createBackgroundSubtractorLSBP()
 
 def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
-    detections = []
-    framee = np.ascontiguousarray(frame* 255).astype(np.uint8)
-    #cv2.imshow("ss", framee)
-    #cv2.waitKey()
-    _, contours,_ = cv2.findContours(framee, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    for contour in contours:
+    frame = np.ascontiguousarray(frame * 255).astype(np.uint8)
+    _, contours,_ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    frame_dets = []
+    foreground_mask_bbs = np.zeros(np.shape(frame))
+    j = 1
+    for con in contours:
+        (x, y, w, h) = cv2.boundingRect(con)
+        if w > 10 and h > 10:
+            frame_dets.append(BoundingBox(int(i), None, 'car', x, y, x + w, y + h, 1))
+            j = j + 1
+    return frame_dets
 
-        (x, y, w, h) = cv2.boundingRect(contour)
-        #if w > box_min_size[0] and h > box_min_size[1]:
-        detections.append(BoundingBox(
-                frame=int(i),
-                id=int(0),
-                label=cls,
-                xtl=float(x),
-                ytl=float(y),
-                xbr=float(x+w),
-                ybr=float(y+h),
-                confidence=None
-            )
-          #  [i, cls, 0, x, y, x + w, y + h]
-        )
-        xy, x2y2 = (int(float(x)), int(float(y))), (int(float(x+w)), int(float(y+h)))
-        color = (0, 255, 0)
-
-
-        cv2.rectangle(img, xy, x2y2, color, 3)
-        #print(xy)
-        #print(x2y2)
-
-    img= cv2.resize(img, (int(1920 / 2), int(1080 / 2)))
-
-    # Show result
-    cv2.imshow('gray', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    return detections
 
 def frames_to_gif(filename, frames):
     #frames = frames.astype('uint8')

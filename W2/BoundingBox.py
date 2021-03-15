@@ -1,6 +1,6 @@
 class BoundingBox:
 
-    def __init__(self, frame, id, label, xtl, ytl, xbr, ybr, confidence = 0):
+    def __init__(self, frame, id, label, xtl, ytl, xbr, ybr, score = 0):
         self.frame = frame
         self.id = id
         self.label = label
@@ -8,7 +8,7 @@ class BoundingBox:
         self.ytl = ytl
         self.xbr = xbr
         self.ybr = ybr
-        self.confidence = confidence
+        self.score = score
 
     @property
     def bbox(self):
