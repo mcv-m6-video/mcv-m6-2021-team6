@@ -14,4 +14,5 @@ __pycache__/
 
 .idea/vcs.xml
 .idea/.gitignore
+**/datasets/
 datasets/frames/
