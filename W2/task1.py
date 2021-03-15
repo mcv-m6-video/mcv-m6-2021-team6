@@ -60,4 +60,6 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
 
 
 if __name__ == '__main__':
-    task1_1(results_path, path_to_video, save_frames = False)
+    # 1. If there's no folder /datasets/frames.... create_frames == True to after create folder and frames
+    create_frames = not(os.path.exists('../datasets/frames'))
+    task1_1(results_path, path_to_video, save_frames = create_frames)
