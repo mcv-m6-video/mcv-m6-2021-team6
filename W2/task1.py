@@ -8,7 +8,7 @@ path_to_frames = 'datasets/frames/'
 results_path = 'Results/Task1_1'
 
 def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY):
-    if(save_frames):
+    if save_frames:
         vidcap = cv2.VideoCapture(path_to_video)
         success, image = vidcap.read()
         count = 1
