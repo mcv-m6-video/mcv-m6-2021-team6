@@ -66,7 +66,27 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
     #plt.ylabel('mAP')
     #plt.legend()
 
+def task2():
+    mu = pkl.load(open('task1_1/mu.pkl', 'rb'))
+    sigma = pkl.load(open('task1_1/sigma.pkl', 'rb'))
+
+    video_n_frames = len(glob.glob1(path_to_frames, "*.jpg"))
+
+    det_bb = remove_bg2(mu,sigma,7,path_to_frames,int(video_n_frames * 0.25),
+                    int(video_n_frames * 0.25 + 100),animation=True, adaptive=True,
+                    color_space=cv2.COLOR_BGR2GRAY)
+
+    reader = AnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
+    gt_bb = reader.get_bboxes_per_frame(classes=['car'])
+
+    animation_2bb('try_dnoise', '.gif', gt_bb, det_bb, path_to_frames, 10, 10, int(video_n_frames * 0.25),
+                  int(1920 / 4), int(1080 / 4))
+
 
 
 if __name__ == '__main__':
-    task1_1(results_path, path_to_video, save_frames = False)
+    # 1. If there's no folder /datasets/frames.... create_frames == True to after create folder and frames
+    create_frames = not(os.path.exists('../datasets/frames'))
+    task1_1(results_path, path_to_video, save_frames = create_frames)
+    task2()
+
