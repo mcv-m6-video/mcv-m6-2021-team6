@@ -7,7 +7,7 @@ path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
 path_to_frames = '../datasets/frames/'
 results_path = '../Results/Task1_1'
 
-def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY):
+def task1_1(save_frames, color_space=cv2.COLOR_BGR2GRAY):
     if(save_frames):
         vidcap = cv2.VideoCapture(path_to_video)
         success, image = vidcap.read()
@@ -28,9 +28,9 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
 
     alphas = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7]
     aps7 = []
-    det_bb = remove_bg(mu,
+    det_bb = remove_background(mu,
                        sigma,
-                       6,
+                       3.5,
                        path_to_frames,
                        int(video_n_frames * 0.25),
                        int(video_n_frames * 0.25 + 100),
@@ -64,4 +64,4 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
 
 
 if __name__ == '__main__':
-    task1_1(results_path, path_to_video, save_frames = False)
+    task1_1( save_frames = False)

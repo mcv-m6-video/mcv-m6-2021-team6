@@ -8,9 +8,9 @@ from tqdm import tqdm
 from scipy import ndimage
 from BoundingBox import *
 
-def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY):
-    mu_file = f"task1_1/mu.pkl"
-    sigma_file = f"task1_1/sigma.pkl"
+def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY, mu_file = f"task1_1/mu.pkl",sigma_file=  f"task1_1/sigma.pkl"):
+    #mu_file = f"task1_1/mu.pkl"
+    #sigma_file = f"task1_1/sigma.pkl"
 
     if os.path.isfile(mu_file) and os.path.isfile(sigma_file):
         mu = pkl.load(open(mu_file, "rb"))
@@ -23,28 +23,32 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY)
     img = cv2.cvtColor(img, color_space)
     cv2.imshow("test", img)
     cv2.waitKey()
+
+    img = np.expand_dims(img, -1)
+
     rng = round(p25_frames)
 
     frames = []
     i = 0
     print('Reading frames...')
-
+    imga = np.zeros((p25_frames, *img.shape)).astype(np.float32)
     for x in range(0, p25_frames):
         if i < rng:
             img = cv2.imread(frames_path + ('/frame_{:04d}.jpg'.format(i + 1)))
             frames.append(img)
+            imga[i, ...] = np.expand_dims(cv2.cvtColor(img, color_space).astype(np.float32),-1)
             i = i + 1
 
     print('Done.')
     # Estimate the median of the images to substract the background
     print('Calculating mean image...')
-    mu = np.mean(frames, axis=(0, -1)).astype(dtype=np.uint8)
+    mu = np.mean(imga, axis=(0, -1), dtype=np.float32)
     print('Calculating std image...')
-    sigma = np.std(frames, axis=(0,-1)).astype(dtype=np.uint8)
+    sigma = np.std(imga, axis=(0,-1), dtype=np.float32)
     print('Done.')
     # cv2.imshow('median', frames_median)
-    cv2.imwrite('task1_1/mu.png', mu)
-    cv2.imwrite('task1_1/std.png', sigma)
+    #cv2.imwrite('mu.png', mu)
+    #cv2.imwrite('sigma.png', sigma)
     # cv2.waitKey(5000)
 
 
@@ -71,7 +75,7 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY)
 
     return mu, sigma
 
-def remove_bg(
+def remove_background(
         mu,
         sigma,
         alpha,
@@ -87,11 +91,14 @@ def remove_bg(
     for i in tqdm(range(initial_frame, final_frame)):
         # read image
         img = cv2.imread(frames_path + ('/frame_{:04d}.jpg'.format(i + 1)))
-        img = cv2.cvtColor(img, color_space).astype(np.float32)
+
+        img = cv2.cvtColor(img, color_space)
 
         if i == initial_frame and animation:
             sx, sy = np.int(np.shape(img)[0] / 4), np.int(np.shape(img)[1] / 4)
             frames = np.zeros((final_frame - initial_frame, sx, sy))
+
+
 
 
         frame = np.zeros(np.shape(img))
@@ -102,27 +109,34 @@ def remove_bg(
         #cv2.imshow("s", frame)
         #cv2.waitKey()
         if len(frame.shape) != 2:
-
-            frame = frame[:, :, channels]
+            #cv2.imshow("s", frame)
+            #cv2.waitKey()
+            frame = frame[:, :, 2]
             frame = frame.sum(-1)
             max_v = frame.max()
             frame[frame == max_v] = 255
             frame[frame != 255] = 0
-
+        #cv2.imshow("s", frame)
+        #cv2.waitKey()
         #frame = np.ascontiguousarray(frame).astype("uint8")
+        frame = np.ascontiguousarray(frame)
 
 
-        detected_bb.append(fg_segmentation_to_boxes(frame, i, img))
         if animation:
             #cv2.imshow("s", frame)
             #cv2.waitKey()
             rframe = cv2.resize(frame, (sy, sx))
-
+            cv2.imshow("s", rframe)
+            cv2.waitKey()
             frames[c, ...] = rframe
+
         c += 1
+        detected_bb.append(fg_segmentation_to_boxes(frame, i, img))
+
 
     #cv2.imshow("s", frame)
     #cv2.waitKey()
+
     if animation:
         frames_to_gif('bg_removal_a{}_p{}_{}.gif'.format(alpha, rho, color_space), frames)
 
@@ -160,15 +174,15 @@ def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
     j = 1
     for con in contours:
         (x, y, w, h) = cv2.boundingRect(con)
-        if w > 10 and h > 10:
-            frame_dets.append(BoundingBox(int(i), None, 'car', x, y, x + w, y + h, 1))
-            j = j + 1
+        frame_dets.append(BoundingBox(int(i), None, 'car', x, y, x + w, y + h, 1))
+        j = j + 1
     return frame_dets
 
 
 def frames_to_gif(filename, frames):
-    #frames = frames.astype('uint8')
-
+    frames = frames.astype('uint8')
+    cv2.imshow("s", frames[3])
+    cv2.waitKey()
     imageio.mimsave(filename, frames)
 
 def animation_2bb(name, format, gt_bb, bb_cords, frame_path, fps=10, seconds=10, ini=0, width=480, height=270):
