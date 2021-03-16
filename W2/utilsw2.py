@@ -9,8 +9,8 @@ from scipy import ndimage
 from BoundingBox import *
 
 def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY):
-    mu_file = f"task1_1/mu.pkl"
-    sigma_file = f"task1_1/sigma.pkl"
+    mu_file = f"W2/task1_1/mu.pkl"
+    sigma_file = f"W2/task1_1/sigma.pkl"
 
     if os.path.isfile(mu_file) and os.path.isfile(sigma_file):
         mu = pkl.load(open(mu_file, "rb"))
@@ -20,9 +20,9 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY)
 
     p25_frames = int(number_frames * 0.25)
     img = cv2.imread(frames_path + '/frame_0001.jpg')
-    img = cv2.cvtColor(img, color_space)
-    cv2.imshow("test", img)
-    cv2.waitKey()
+    #img = cv2.cvtColor(img, color_space)
+    #cv2.imshow("test", img)
+    #cv2.waitKey()
     rng = round(p25_frames)
 
     frames = []
@@ -71,6 +71,49 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY)
 
     return mu, sigma
 
+def remove_bg3(
+        roi,
+        Filter,
+        backSub,
+        frame_path,
+        initial_frame,
+        final_frame,
+        color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
+
+    kernel = np.ones((3, 3), np.uint8)
+    c = 0
+    det_bb = []
+    for i in tqdm(range(initial_frame, final_frame)):
+        # read image
+        img = cv2.imread(frame_path + ('/frame_{:04d}.jpg'.format(i + 1)))
+        #img = cv2.cvtColor(img, color_space).astype(np.float32)
+
+        if Filter == 'yes':
+            fgMask = backSub.apply(img)
+            fgMask = fgMask & roi
+            fgMask = cv2.morphologyEx(fgMask, cv2.MORPH_OPEN, kernel)
+            fgMask = cv2.morphologyEx(fgMask, cv2.MORPH_CLOSE, kernel)
+
+            _, fgMask = cv2.threshold(fgMask, 150, 255, cv2.THRESH_BINARY)
+            fgMask = cv2.morphologyEx(fgMask, cv2.MORPH_DILATE, np.ones((5, 5), np.uint8))
+        else:
+            print('false')
+            fgMask = backSub.apply(img)
+
+        det_bb += [fg_segmentation_to_boxes(fgMask, i, img)]
+
+        c += 1
+
+        cv2.imshow('Frame', img)
+        cv2.imshow('FG Mask', fgMask)
+
+        #keyboard = cv2.waitKey(10)
+
+        #if keyboard == 'q' or keyboard == 27:
+            #break
+
+    return det_bb
+
 def remove_bg(
         mu,
         sigma,
@@ -112,7 +155,7 @@ def remove_bg(
         #frame = np.ascontiguousarray(frame).astype("uint8")
 
 
-        detected_bb += fg_segmentation_to_boxes(frame, i, img)
+        detected_bb.append(fg_segmentation_to_boxes(frame, i, img))
         if animation:
             #cv2.imshow("s", frame)
             #cv2.waitKey()
@@ -142,54 +185,31 @@ def denoise_bg(frame):
     return (filled * 255).astype(np.uint8)
 
 
-def bg_estimation(mode, **kwargs):
-    if mode == 'mog':
-        return cv2.createBackgroundSubtractorMOG2(detectShadows=True)
-    if mode == 'knn':
-        return cv2.createBackgroundSubtractorKNN(detectShadows=True)
-    if mode == 'gmg':
-        return cv2.bgsegm.createBackgroundSubtractorGMG()
-    if mode == 'LSBP':
-        return cv2.bgsegm.createBackgroundSubtractorLSBP()
+def bg_estimation(Method, **kwargs):
+    if Method == 'MOG2':
+        backSub = cv2.createBackgroundSubtractorMOG2()
+    elif Method == 'KNN':
+        print('KNN')
+        backSub = cv2.createBackgroundSubtractorKNN()
+    elif Method == 'LSBP':
+        backSub = cv2.bgsegm.createBackgroundSubtractorLSBP()
+    elif Method == 'MOG':
+        backSub = cv2.bgsegm.createBackgroundSubtractorMOG()
+
+    return backSub
 
 def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
-    detections = []
-    framee = np.ascontiguousarray(frame* 255).astype(np.uint8)
-    #cv2.imshow("ss", framee)
-    #cv2.waitKey()
-    _, contours,_ = cv2.findContours(framee, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    for contour in contours:
-
-        (x, y, w, h) = cv2.boundingRect(contour)
-        #if w > box_min_size[0] and h > box_min_size[1]:
-        detections.append(BoundingBox(
-                frame=int(i),
-                id=int(0),
-                label=cls,
-                xtl=float(x),
-                ytl=float(y),
-                xbr=float(x+w),
-                ybr=float(y+h),
-                confidence=None
-            )
-          #  [i, cls, 0, x, y, x + w, y + h]
-        )
-        xy, x2y2 = (int(float(x)), int(float(y))), (int(float(x+w)), int(float(y+h)))
-        color = (0, 255, 0)
-
-
-        cv2.rectangle(img, xy, x2y2, color, 3)
-        #print(xy)
-        #print(x2y2)
-
-    img= cv2.resize(img, (int(1920 / 2), int(1080 / 2)))
-
-    # Show result
-    cv2.imshow('gray', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    return detections
+    frame = np.ascontiguousarray(frame * 255).astype(np.uint8)
+    contours,_ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    frame_dets = []
+    foreground_mask_bbs = np.zeros(np.shape(frame))
+    j = 1
+    for con in contours:
+        (x, y, w, h) = cv2.boundingRect(con)
+        if w > 100 and h > 100:
+            frame_dets.append(BoundingBox(int(i), None, 'car', x, y, x + w, y + h, 1))
+            j = j + 1
+    return frame_dets
 
 def frames_to_gif(filename, frames):
     #frames = frames.astype('uint8')
