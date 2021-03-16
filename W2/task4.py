@@ -1,6 +1,7 @@
 from utilsw2 import *
 from Reader import *
 from Adapted_voc_evaluation import *
+import glob
 path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
 path_to_frames = '../datasets/frames/'
 results_path = '../Results/Task1_1'

@@ -1,5 +1,6 @@
 import cv2
 import os
+import glob
 import pickle as pkl
 import imageio
 import numpy as np
@@ -8,6 +9,7 @@ from scipy import ndimage
 from BoundingBox import *
 
 def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY, mu_file = f"task1_1/mu.pkl",sigma_file=  f"task1_1/sigma.pkl"):
+
 
     if os.path.isfile(mu_file) and os.path.isfile(sigma_file):
         mu = pkl.load(open(mu_file, "rb"))
@@ -36,6 +38,8 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY,
             imga[i, ...] = np.expand_dims(cv2.cvtColor(img, color_space).astype(np.float32),-1)
             i = i + 1
 
+    print('Done.')
+    # Estimate the median of the images to substract the background
     print('Calculating mean image...')
     mu = np.mean(imga, axis=(0, -1), dtype=np.float32)
     print('Calculating std image...')
@@ -69,13 +73,20 @@ def remove_background(
             sx, sy = np.int(np.shape(img)[0] / 4), np.int(np.shape(img)[1] / 4)
             frames = np.zeros((final_frame - initial_frame, sx, sy))
 
+
+
+
         frame = np.zeros(np.shape(img))
 
         frame[np.abs(img - mu) >= alpha * (sigma + 2)] = 1
         frame[np.abs(img - mu) < alpha * (sigma + 2)] = 0
 
+        #cv2.imshow("s", frame)
+        #cv2.waitKey()
         if len(frame.shape) != 2:
+
             frame = frame[:, :, channels]
+
         frame = np.ascontiguousarray(frame)
 
 
@@ -115,11 +126,11 @@ def bg_estimation(mode, **kwargs):
     if mode == 'LSBP':
         return cv2.bgsegm.createBackgroundSubtractorLSBP()
 
-def fg_segmentation_to_boxes(frame, i):
+def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
     frame = np.ascontiguousarray(frame * 255).astype(np.uint8)
     _, contours,_ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     frame_dets = []
-
+    foreground_mask_bbs = np.zeros(np.shape(frame))
     j = 1
     for con in contours:
         (x, y, w, h) = cv2.boundingRect(con)
