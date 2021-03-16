@@ -12,6 +12,9 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY,
 
 
     if os.path.isfile(mu_file) and os.path.isfile(sigma_file):
+        img = cv2.imread(frames_path + '/frame_0001.jpg')
+        img = cv2.cvtColor(img, color_space)
+        cv2.imwrite(f"imagenamespace_{color_space}.png", img)
         mu = pkl.load(open(mu_file, "rb"))
         sigma = pkl.load(open(sigma_file, "rb"))
         print(f"Loading {mu_file} and {sigma_file}")
@@ -20,8 +23,8 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY,
     p25_frames = int(number_frames * 0.25)
     img = cv2.imread(frames_path + '/frame_0001.jpg')
     img = cv2.cvtColor(img, color_space)
-    cv2.imshow("test", img)
-    cv2.waitKey()
+    cv2.imwrite(f"imagenamespace_{color_space}", img)
+    #cv2.waitKey()
 
     img = np.expand_dims(img, -1)
 
