@@ -109,13 +109,15 @@ def remove_background(
         #cv2.imshow("s", frame)
         #cv2.waitKey()
         if len(frame.shape) != 2:
+
+            frame = frame[:, :, channels]
             #cv2.imshow("s", frame)
             #cv2.waitKey()
-            frame = frame[:, :, 2]
-            frame = frame.sum(-1)
-            max_v = frame.max()
-            frame[frame == max_v] = 255
-            frame[frame != 255] = 0
+            #frame = frame.sum(-1)
+            #max_v = frame.max()
+            #frame[frame == max_v] = 255
+            #frame[frame != 255] = 0
+
         #cv2.imshow("s", frame)
         #cv2.waitKey()
         #frame = np.ascontiguousarray(frame).astype("uint8")
@@ -126,8 +128,8 @@ def remove_background(
             #cv2.imshow("s", frame)
             #cv2.waitKey()
             rframe = cv2.resize(frame, (sy, sx))
-            cv2.imshow("s", rframe)
-            cv2.waitKey()
+            #cv2.imshow("s", rframe)
+            #cv2.waitKey()
             frames[c, ...] = rframe
 
         c += 1
@@ -138,6 +140,9 @@ def remove_background(
     #cv2.waitKey()
 
     if animation:
+        #cv2.imshow("s", frame)
+        #cv2.waitKey()
+
         frames_to_gif('bg_removal_a{}_p{}_{}.gif'.format(alpha, rho, color_space), frames)
 
     return detected_bb
@@ -180,9 +185,7 @@ def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
 
 
 def frames_to_gif(filename, frames):
-    frames = frames.astype('uint8')
-    cv2.imshow("s", frames[3])
-    cv2.waitKey()
+
     imageio.mimsave(filename, frames)
 
 def animation_2bb(name, format, gt_bb, bb_cords, frame_path, fps=10, seconds=10, ini=0, width=480, height=270):
