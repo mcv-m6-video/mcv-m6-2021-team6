@@ -7,7 +7,43 @@ from BoundingBox import *
 import xmltodict
 
 
-def parse_annotations(path):
+class AICityChallengeAnnotationReader:
+
+    def __init__(self, path,  initFrame, finalFrame):
+        self.annotations = parse_annotations(path,  initFrame, finalFrame)
+        self.classes = np.unique([det.label for det in self.annotations])
+
+    def get_annotations(self, classes=None, noise_params=None, do_group_by_frame=True, only_not_parked=False):
+        """
+        Returns:
+            detections: {frame: [Detection,...]} if group_by_frame=True
+        """
+
+        if classes is None:
+            classes = self.classes
+
+        detections = []
+        for det in self.annotations:
+            if det.label in classes:  # filter by class
+                d = deepcopy(det)
+                if noise_params:  # add noise
+                    if np.random.random() > noise_params['drop']:
+                        box_noisy = d.bbox + np.random.normal(noise_params['mean'], noise_params['std'], 4)
+                        d.xtl = box_noisy[0]
+                        d.ytl = box_noisy[1]
+                        d.xbr = box_noisy[2]
+                        d.ybr = box_noisy[3]
+                        detections.append(d)
+                else:
+                    detections.append(d)
+
+        if do_group_by_frame:
+            detections = group_by_frame(detections)
+
+        return detections
+
+
+def parse_annotations(path, initFrame, finalFrame):
     root, ext = os.path.splitext(path)
 
     if ext == ".xml":
@@ -32,7 +68,7 @@ def parse_annotations(path):
                     ytl=float(box['@ytl']),
                     xbr=float(box['@xbr']),
                     ybr=float(box['@ybr']),
-                    confidence=None
+                    score=None
                 ))
 
     if ext == ".txt":
@@ -54,7 +90,7 @@ def parse_annotations(path):
                 ytl=float(data[3]),
                 xbr=float(data[2]) + float(data[4]),
                 ybr=float(data[3]) + float(data[5]),
-                confidence=float(data[6])
+                score=float(data[6])
             ))
 
     return annotations
@@ -79,9 +115,9 @@ class AnnotationReader:
     """
     Creates AnnotationReader object that reads the annotations
     """
-    def __init__(self, path):
+    def __init__(self, path,  initFrame, finalFrame):
         # Read XML file
-        self.annotations = parse_annotations(path)
+        self.annotations = parse_annotations(path,  initFrame, finalFrame)
         self.classes = np.unique([bb.label for bb in self.annotations])
 
     def get_bboxes_per_frame(self, classes=None, noise_params=None):
@@ -110,3 +146,4 @@ class AnnotationReader:
         bboxes = group_by_frame(bboxes)
 
         return bboxes
+

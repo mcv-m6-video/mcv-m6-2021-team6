@@ -8,7 +8,6 @@ from tqdm import tqdm
 from scipy import ndimage
 from BoundingBox import *
 
-
 def GetGaussianModel(frames_path, number_frames, color_space=cv2.COLOR_BGR2GRAY):
     mu_file = f"task1_1/mu.pkl"
     sigma_file = f"task1_1/sigma.pkl"
@@ -21,9 +20,9 @@ def GetGaussianModel(frames_path, number_frames, color_space=cv2.COLOR_BGR2GRAY)
 
     p25_frames = int(number_frames * 0.25)
     img = cv2.imread(frames_path + '/frame_0001.jpg')
-    img = cv2.cvtColor(img, color_space)
-    cv2.imshow("test", img)
-    cv2.waitKey()
+    #img = cv2.cvtColor(img, color_space)
+    #cv2.imshow("test", img)
+    #cv2.waitKey()
     rng = round(p25_frames)
 
     frames = []
@@ -69,9 +68,60 @@ def GetGaussianModel(frames_path, number_frames, color_space=cv2.COLOR_BGR2GRAY)
 
     return mu, sigma
 
+def remove_bg3(
+        roi,
+        Filter,
+        backSub,
+        frame_path,
+        initial_frame,
+        final_frame,
+        color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
 
-def remove_bg(mu, sigma, alpha, frames_path, initial_frame, final_frame, animation=False, rho=0.2,
-              color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
+    kernel = np.ones((3, 3), np.uint8)
+    c = 0
+    det_bb = []
+    for i in tqdm(range(initial_frame, final_frame)):
+        # read image
+        img = cv2.imread(frame_path + ('/frame_{:04d}.jpg'.format(i + 1)))
+        #img = cv2.cvtColor(img, color_space).astype(np.float32)
+
+        if Filter == 'yes':
+            fgMask = backSub.apply(img)
+            fgMask = fgMask & roi
+            fgMask = cv2.morphologyEx(fgMask, cv2.MORPH_OPEN, kernel)
+            fgMask = cv2.morphologyEx(fgMask, cv2.MORPH_CLOSE, kernel)
+
+            _, fgMask = cv2.threshold(fgMask, 150, 255, cv2.THRESH_BINARY)
+            fgMask = cv2.morphologyEx(fgMask, cv2.MORPH_DILATE, np.ones((5, 5), np.uint8))
+        else:
+            print('false')
+            fgMask = backSub.apply(img)
+
+        det_bb += [fg_segmentation_to_boxes(fgMask, i, img)]
+
+        c += 1
+
+        cv2.imshow('Frame', img)
+        cv2.imshow('FG Mask', fgMask)
+
+        #keyboard = cv2.waitKey(10)
+
+        #if keyboard == 'q' or keyboard == 27:
+            #break
+
+    return det_bb
+
+def remove_bg(
+        mu,
+        sigma,
+        alpha,
+        frames_path,
+        initial_frame,
+        final_frame,
+        animation=False,
+        rho=0.2,
+        color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
+  
     c = 0
     detected_bb = []
     for i in tqdm(range(initial_frame, final_frame)):
@@ -99,7 +149,7 @@ def remove_bg(mu, sigma, alpha, frames_path, initial_frame, final_frame, animati
 
         # frame = np.ascontiguousarray(frame).astype("uint8")
 
-        detected_bb += fg_segmentation_to_boxes(frame, i, img)
+        detected_bb.append(fg_segmentation_to_boxes(frame, i, img))
         if animation:
             # cv2.imshow("s", frame)
             # cv2.waitKey()
@@ -179,16 +229,18 @@ def denoise_bg(frame):
     return (filled * 255).astype(np.uint8)
 
 
-def bg_estimation(mode, **kwargs):
-    if mode == 'mog':
-        return cv2.createBackgroundSubtractorMOG2(detectShadows=True)
-    if mode == 'knn':
-        return cv2.createBackgroundSubtractorKNN(detectShadows=True)
-    if mode == 'gmg':
-        return cv2.bgsegm.createBackgroundSubtractorGMG()
-    if mode == 'LSBP':
-        return cv2.bgsegm.createBackgroundSubtractorLSBP()
+def bg_estimation(Method, **kwargs):
+    if Method == 'MOG2':
+        backSub = cv2.createBackgroundSubtractorMOG2()
+    elif Method == 'KNN':
+        print('KNN')
+        backSub = cv2.createBackgroundSubtractorKNN()
+    elif Method == 'LSBP':
+        backSub = cv2.bgsegm.createBackgroundSubtractorLSBP()
+    elif Method == 'MOG':
+        backSub = cv2.bgsegm.createBackgroundSubtractorMOG()
 
+    return backSub
 
 def fg_segmentation_to_boxes(frame, i, img, box_min_size=(10, 10), cls='car'):
     detections = []
