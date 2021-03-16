@@ -68,7 +68,7 @@ def parse_annotations(path, initFrame, finalFrame):
                     ytl=float(box['@ytl']),
                     xbr=float(box['@xbr']),
                     ybr=float(box['@ybr']),
-                    score=None
+                    #score=None
                 ))
 
     if ext == ".txt":

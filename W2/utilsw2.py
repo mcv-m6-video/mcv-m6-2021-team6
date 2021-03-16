@@ -172,8 +172,8 @@ def remove_bg2(mu, sigma, alpha, frames_path, initial_frame, final_frame, animat
     detected_bb = []
     for i in tqdm(range(initial_frame, final_frame)):
         # read image
-        img = cv2.imread(frames_path + ('/frame_{:04d}.jpg'.format(i + 1)))
-        img = cv2.cvtColor(img, color_space).astype(np.float32)
+        img = cv2.imread(frames_path + ('frame_{:04d}.jpg'.format(i + 1)))
+        img = cv2.cvtColor(img, color_space).astype(np.uint8)
 
         if i == initial_frame and animation:
             sx, sy = np.int(np.shape(img)[0] / 4), np.int(np.shape(img)[1] / 4)
@@ -273,9 +273,9 @@ def fg_segmentation_to_boxes(frame, i, img, box_min_size=(10, 10), cls='car'):
     img = cv2.resize(img, (int(1920 / 2), int(1080 / 2)))
 
     # Show result
-    cv2.imshow('gray', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.imshow('gray', img)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
     return detections
 

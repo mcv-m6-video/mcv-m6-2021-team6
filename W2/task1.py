@@ -3,9 +3,11 @@ from utilsw2 import *
 from Reader import *
 import cv2
 from Adapted_voc_evaluation import *
-path_to_video = 'datasets/AICity_data/train/S03/c010/vdo.avi'
-path_to_frames = 'datasets/frames/'
-results_path = 'Results/Task1_1'
+import pickle
+path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
+path_to_frames = '../datasets/frames/'
+results_path = './results/Task1_1'
+
 
 def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY):
     if(save_frames):
@@ -67,17 +69,44 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
     #plt.legend()
 
 def task2():
+
+    init_frame=0
+    final_frame=25
+
     mu = pkl.load(open('task1_1/mu.pkl', 'rb'))
     sigma = pkl.load(open('task1_1/sigma.pkl', 'rb'))
 
     video_n_frames = len(glob.glob1(path_to_frames, "*.jpg"))
 
-    det_bb = remove_bg2(mu,sigma,7,path_to_frames,int(video_n_frames * 0.25),
+    '''
+    det_bb = remove_bg2(mu,sigma,0.8,path_to_frames,int(video_n_frames * 0.25),
                     int(video_n_frames * 0.25 + 100),animation=True, adaptive=True,
                     color_space=cv2.COLOR_BGR2GRAY)
+    '''
 
-    reader = AnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
-    gt_bb = reader.get_bboxes_per_frame(classes=['car'])
+    '''
+    #SAVE
+    f = open('det_bb.pckl', 'wb')
+    pickle.dump(det_bb, f)
+    f.close()
+    '''
+    # LOAD
+    with open('det_bb.pckl', 'rb') as f:
+        det_bb = pickle.load(f)
+
+
+    reader = AnnotationReader(path='../datasets/ai_challenge_s03_c010-full_annotation.xml', initFrame=init_frame, finalFrame=final_frame)
+    gt = reader.get_annotations(classes=['car'], only_not_parked=True)
+
+    bb_gt = []
+    # for frame in gt.keys():
+    for frame in range(int(video_n_frames * 0.25),  int(video_n_frames)):
+        annotations = gt.get(frame, [])
+        bb_gt.append(annotations)
+
+    ap, prec, rec = mean_average_precision(bb_gt, det_bb)
+    print(ap)
+
 
     animation_2bb('try_dnoise', '.gif', gt_bb, det_bb, path_to_frames, 10, 10, int(video_n_frames * 0.25),
                   int(1920 / 4), int(1080 / 4))
@@ -86,7 +115,7 @@ def task2():
 
 if __name__ == '__main__':
     # 1. If there's no folder /datasets/frames.... create_frames == True to after create folder and frames
-    create_frames = not(os.path.exists('../datasets/frames'))
-    task1_1(results_path, path_to_video, save_frames = create_frames)
+    #create_frames = not(os.path.exists('../datasets/frames'))
+    #task1_1(results_path, path_to_video, save_frames = create_frames)
     task2()
 
