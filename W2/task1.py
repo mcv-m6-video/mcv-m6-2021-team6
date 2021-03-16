@@ -3,9 +3,9 @@ from utilsw2 import *
 from Reader import *
 import cv2
 from Adapted_voc_evaluation import *
-path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
-path_to_frames = '../datasets/frames/'
-results_path = '../Results/Task1_1'
+path_to_video = 'datasets/AICity_data/train/S03/c010/vdo.avi'
+path_to_frames = 'datasets/frames/'
+results_path = 'Results/Task1_1'
 
 def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY):
     if(save_frames):
@@ -30,23 +30,32 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
     aps7 = []
     det_bb = remove_bg(mu,
                        sigma,
-                       7,
+                       6,
                        path_to_frames,
                        int(video_n_frames * 0.25),
-                       int(video_n_frames * 0.25 + 100),
+                       int(video_n_frames),
                        animation=True,
                        color_space=color_space)
 
-    reader = AnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
-    gt_bb = reader.get_bboxes_per_frame(classes=['car'])
+    #reader = AnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml', initFrame=int(video_n_frames * 0.25), finalFrame=int(video_n_frames * 0.25 + 100))
+    #gt_bb = reader.get_bboxes_per_frame(classes=['car'])
+    reader = AICityChallengeAnnotationReader(path='datasets/AICity_data/train/S03/c010/gt/gt.txt',initFrame=int(video_n_frames * 0.25), finalFrame=int(video_n_frames))
+    gt = reader.get_annotations(classes=['car'], only_not_parked=True)
 
-    #ap, prec, rec = average_precision(gt_bb , det_bb)
-    #print (ap)
+    bb_gt = []
+    # for frame in gt.keys():
+    for frame in range(int(video_n_frames * 0.25),  int(video_n_frames)):
+        annotations = gt.get(frame, [])
+        bb_gt.append(annotations)
+
+
+    ap, prec, rec = mean_average_precision(bb_gt , det_bb)
+    print(ap)
     #print (prec)
     #print(rec)
     # ap = calculate_ap(det_bb, gt_bb, int(video_n_frames * 0.25), video_n_frames, mode='area')
-    animation_2bb('try_dnoise', '.gif', gt_bb, det_bb, path_to_frames, 10, 10, int(video_n_frames * 0.25),
-                  int(1920 / 4), int(1080 / 4))
+    #animation_2bb('try_dnoise', '.gif', gt_bb, det_bb, path_to_frames, 10, 10, int(video_n_frames * 0.25),
+    #              int(1920 / 4), int(1080 / 4))
 
 
     #plt.title('Median Filter')
@@ -60,6 +69,4 @@ def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY
 
 
 if __name__ == '__main__':
-    # 1. If there's no folder /datasets/frames.... create_frames == True to after create folder and frames
-    create_frames = not(os.path.exists('../datasets/frames'))
-    task1_1(results_path, path_to_video, save_frames = create_frames)
+    task1_1(results_path, path_to_video, save_frames = False)
