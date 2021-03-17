@@ -7,21 +7,20 @@
 </ul>
 
 
-## Tasks W1 (from slides):
+## Tasks W2 (from slides):
 
-- [x] Install and setup the development framework (using Local & GCloud Remote)
-
-- [ ] T1.1 - IoU & mAP for groundtruth + noise
-- [ ] T1.2 - mAP for provided object detections
-- [ ] T2   - Temporal Analysis of the Results
-- [x] T3.1 - MSEN
-- [x] T3.2 - PEPN
-- [x] T3.3 - Analysis & Visualizations
-- [x] T4   - Optical flow plot
+- [x] T1.1 - Gaussian modelling
+- [x] T1.2 & 1.3 - Evaluate results
+- [ ] T2   - Adaptive modelling
+- [ ] T2.2 - Comparison adaptive vs non
+- [x] T3   - Comparison with state-of-the-art 
+- [x] T4   - Color
 
 ## Setting up environment
 
 `Python 3.7` + `TensorBoard 2.4` + `torch 0.8` + `openCV 4.1` + `detectron2 v0.3`
+
+Requirements for this delivery are the usual ones: `numpy`, `scipy`, 
 
 You can find the full conda environment used in the Google Cloud instance in `requirements.txt`
 
