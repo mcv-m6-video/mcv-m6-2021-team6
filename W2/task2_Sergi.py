@@ -1,6 +1,8 @@
 from utilsw2 import *
 from Reader import *
 import cv2
+import pickle
+import os
 from Adapted_voc_evaluation import *
 
 path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
@@ -72,17 +74,46 @@ def remove_bg2(
 
 def task2():
 
-    mu = pkl.load(open('task1_1/mu.pkl', 'rb'))
-    sigma = pkl.load(open('task1_1/sigma.pkl', 'rb'))
+    mu_origin = pkl.load(open('task1_1/mu.pkl', 'rb'))
+    sigma_origin = pkl.load(open('task1_1/sigma.pkl', 'rb'))
 
     video_n_frames = len(glob.glob1(path_to_frames, "*.jpg"))
 
-    alpha = [0.5, 0.8, 1, 1.5, 2, 2.3, 2.5, 3, 3.5, 4, 5, 7, 8]
-    r = [0.1, 0.2, 0.5, 1, 1.2, 1.5, 2]
+
+    #alpha = [0.5, 0.8, 1, 1.5, 2, 2.3, 2.5, 3, 3.5, 4, 5, 7, 8]
+    #r = [0.1, 0.2, 0.5, 1, 1.2, 1.5, 2]
+
+    alpha_bis = [5, 0.7, 2.5]
+    r_bis = [0.000001, 0.00005, 0.05, 0.7, 1]
+
+    # Snippet of code if do you want to use in range. Used to perform the grid search
+    #alpha_bis = np.arange(start=1.3, stop=10, step=0.3 )
+    #r_bis = np.arange(start=0.8, stop=5, step=0.1)
+
+    #alpha = alpha_bis
+    #r = r_bis
+    print("List of alpha values:" , alpha_bis)
+    print("List of rho values:", r_bis)
+
     map = []
-    for al in alpha:
+    for al in alpha_bis:
         a = []
-        for ro in r:
+        for ro in r_bis:
+            '''
+            # checking previous results are not better than last ones
+            # This was used for assisting a human-grid search
+            if len(map)>5:
+                print ("MAP [-1] = " + str(map[-1]))
+                print("MAP [-2] = " + str(map[-2]))
+                bool1 = map[-2] > map[-1]
+                bool2 = map[-3] > map[-1]
+                bool3 = map[-4] > map[-1]
+
+                if (bool1 and bool2 and bool3):
+                    break
+            '''
+            mu = mu_origin
+            sigma = sigma_origin
             print('Alpha & rho = ', al, ro)
             det_bb = remove_bg2(mu,
                                sigma,
@@ -109,10 +140,14 @@ def task2():
             ap, prec, rec = mean_average_precision(bb_gt , det_bb)
 
             a.append(ap)
-            print(a)
+            print("El valors obtingut son: " + str(a))
         print(max(a))
         map.append(max(a))
 
+    # SAVING:
+    f = open('map_results.pckl', 'wb')
+    pickle.dump(map, f)
+    f.close()
     print(len(map))
 
 
