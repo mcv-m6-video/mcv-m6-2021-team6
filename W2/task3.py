@@ -6,6 +6,7 @@ from Adapted_voc_evaluation import *
 import cv2 as cv2
 import numpy as np
 from docopt import docopt
+import imageio
 
 path_to_video = 'datasets/AICity_data/train/S03/c010/vdo.avi'
 path_to_frames = 'datasets/frames/'
@@ -55,8 +56,12 @@ def task3 (results_path, path_to_video, save_frames = True, Method ='KNN', Filte
         annotations = gt.get(frame, [])
         bb_gt.append(annotations)
 
+
+
+
     ap, prec, rec = average_precision(bb_gt, det_bb)
     print(ap)
 
 if __name__ == '__main__':
-    task3(results_path, path_to_video, save_frames = False, Method ='KNN', Filter = 'yes')
+    task3(results_path, path_to_video, save_frames = False, Method ='MOG', Filter = 'yes')
+
