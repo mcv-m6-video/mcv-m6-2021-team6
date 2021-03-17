@@ -95,7 +95,7 @@ def task2():
         det_bb = pickle.load(f)
 
 
-    reader = AnnotationReader(path='../datasets/ai_challenge_s03_c010-full_annotation.xml', initFrame=init_frame, finalFrame=final_frame)
+    reader = AICityChallengeAnnotationReader(path='../datasets/ai_challenge_s03_c010-full_annotation.xml', initFrame=init_frame, finalFrame=final_frame)
     gt = reader.get_annotations(classes=['car'], only_not_parked=True)
 
     bb_gt = []

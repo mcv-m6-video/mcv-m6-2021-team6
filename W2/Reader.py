@@ -120,6 +120,9 @@ class AnnotationReader:
         self.annotations = parse_annotations(path,  initFrame, finalFrame)
         self.classes = np.unique([bb.label for bb in self.annotations])
 
+    def get_annotations(self, classes=None, noise_params=None, do_group_by_frame=True, only_not_parked=False):
+        super
+
     def get_bboxes_per_frame(self, classes=None, noise_params=None):
         """
         This function returns the bounding boxes sorted by frame, in the format {frame: [BB, BB, BB...]}

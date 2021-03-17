@@ -72,7 +72,7 @@ def method2(im_paths):
     #Copying values of paper
     T = round(len(im_paths) / 4)
     img = cv.imread(train[0])
-    dim = (640, 360)
+    dim = (240, 135)
     img = cv.resize(img, dim)
     img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     H, W = img.shape
@@ -88,7 +88,7 @@ def method2(im_paths):
     mu = np.array([[[np.zeros(3) for k in range(K)] for j in range(W)] for i in range(H)])
     sd = np.array([[[225 * np.eye(3) for k in range(K)] for j in range(W)] for i in range(H)])
 
-
+    '''
     # IF YOU DON'T HAVE PKL FILES, UNCOMMENT
     # Very small size
     #dim = (128,72)
@@ -169,9 +169,8 @@ def method2(im_paths):
         mu= pickle.load(f)
     with open('SD_matrix.pckl', 'rb') as f:
         sd= pickle.load(f)
-    with open('weight_matrix.pckl', 'rb') as f:
-        weight= pickle.load(f)
-    '''
+    #with open('weight_matrix.pckl', 'rb') as f:
+    #   weight= pickle.load(f)
 
     for ind, test in enumerate(im_paths):
         img = cv.imread(test)
@@ -185,7 +184,7 @@ def method2(im_paths):
                         result[i][j] = 255
                     else:
                         result[i][j] = 0
-        cv.imwrite(r'./result/' + '%05d' % ind + '.png', result)
+        cv.imwrite(r'./result/' + '%05d' % ind + '.bmp', result)
 
 
 if __name__ == '__main__':
