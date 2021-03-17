@@ -8,8 +8,9 @@ from tqdm import tqdm
 from scipy import ndimage
 from BoundingBox import *
 
-def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY, mu_file = f"W2/task1_1/mu.pkl",sigma_file=  f"W2/task1_1/sigma.pkl"):
 
+def GetGaussianModel(frames_path, number_frames, color_space=cv2.COLOR_BGR2GRAY,
+                     mu_file=f"../W2/task1_1/mu.pkl", sigma_file=f"../W2/task1_1/sigma.pkl"):
     if os.path.isfile(mu_file) and os.path.isfile(sigma_file):
         mu = pkl.load(open(mu_file, "rb"))
         sigma = pkl.load(open(sigma_file, "rb"))
@@ -19,8 +20,8 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY,
     p25_frames = int(number_frames * 0.25)
     img = cv2.imread(frames_path + '/frame_0001.jpg')
     img = cv2.cvtColor(img, color_space)
-    #cv2.imshow("test", img)
-    #cv2.waitKey()
+    # cv2.imshow("test", img)
+    # cv2.waitKey()
 
     img = np.expand_dims(img, -1)
 
@@ -34,7 +35,7 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY,
         if i < rng:
             img = cv2.imread(frames_path + ('/frame_{:04d}.jpg'.format(i + 1)))
             frames.append(img)
-            imga[i, ...] = np.expand_dims(cv2.cvtColor(img, color_space).astype(np.float32),-1)
+            imga[i, ...] = np.expand_dims(cv2.cvtColor(img, color_space).astype(np.float32), -1)
             i = i + 1
 
     print('Done.')
@@ -42,12 +43,13 @@ def GetGaussianModel(frames_path, number_frames ,color_space=cv2.COLOR_BGR2GRAY,
     print('Calculating mean image...')
     mu = np.mean(imga, axis=(0, -1), dtype=np.float32)
     print('Calculating std image...')
-    sigma = np.std(imga, axis=(0,-1), dtype=np.float32)
+    sigma = np.std(imga, axis=(0, -1), dtype=np.float32)
 
     pkl.dump(mu, open(mu_file, "wb"))
     pkl.dump(sigma, open(sigma_file, "wb"))
 
     return mu, sigma
+
 
 def remove_bg3(
         roi,
@@ -57,7 +59,6 @@ def remove_bg3(
         initial_frame,
         final_frame,
         color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
-
     kernel = np.ones((3, 3), np.uint8)
     c = 0
     det_bb = []
@@ -66,7 +67,7 @@ def remove_bg3(
     for i in tqdm(range(initial_frame, final_frame)):
         # read image
         img = cv2.imread(frame_path + ('/frame_{:04d}.jpg'.format(i + 1)))
-        #img = cv2.cvtColor(img, color_space).astype(np.float32)
+        # img = cv2.cvtColor(img, color_space).astype(np.float32)
 
         if Filter == 'yes':
             fgMask = backSub.apply(img)
@@ -84,7 +85,7 @@ def remove_bg3(
         det_bb.append(det)
         img = im
 
-        if i > (initial_frame + 5) and final_frame <800:
+        if i > (initial_frame + 5) and final_frame < 800:
             images.append(img)
             images2.append(fgMask)
         c += 1
@@ -94,6 +95,7 @@ def remove_bg3(
         imageio.mimsave('Results/MOG.gif', images2)
 
     return det_bb
+
 
 def remove_bg(
         mu,
@@ -105,7 +107,6 @@ def remove_bg(
         animation=False,
         rho=0.2,
         color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
-
     roi = cv2.imread('datasets/AICity_data/train/S03/c010/roi.jpg', cv2.IMREAD_GRAYSCALE)
     c = 0
     det_bb = []
@@ -118,16 +119,14 @@ def remove_bg(
             sx, sy = np.int(np.shape(img)[0] / 4), np.int(np.shape(img)[1] / 4)
             frames = np.zeros((final_frame - initial_frame, sx, sy))
 
-
         frame = np.zeros(np.shape(img))
 
         frame[np.abs(img - mu) >= alpha * (sigma + 2)] = 1
         frame[np.abs(img - mu) < alpha * (sigma + 2)] = 0
 
-        #cv2.imshow("s", frame)
-        #cv2.waitKey()
+        # cv2.imshow("s", frame)
+        # cv2.waitKey()
         if len(frame.shape) != 2:
-
             frame = frame[:, :, channels]
             frame = frame.sum(-1)
             max_v = frame.max()
@@ -135,11 +134,11 @@ def remove_bg(
             frame[frame != 255] = 0
             frame = frame & roi
 
-        #frame = np.ascontiguousarray(frame).astype("uint8")
+        # frame = np.ascontiguousarray(frame).astype("uint8")
 
         if animation:
-            #cv2.imshow("s", frame)
-            #cv2.waitKey()
+            # cv2.imshow("s", frame)
+            # cv2.waitKey()
             rframe = cv2.resize(frame, (sy, sx))
 
             frames[c, ...] = rframe
@@ -148,12 +147,13 @@ def remove_bg(
         det, im = fg_segmentation_to_boxes(frame, i, img)
         det_bb.append(det)
 
-    #cv2.imshow("s", frame)
-    #cv2.waitKey()
+    # cv2.imshow("s", frame)
+    # cv2.waitKey()
     if animation:
         frames_to_gif('bg_removal_a{}_p{}_{}.gif'.format(alpha, rho, color_space), frames)
 
     return det_bb
+
 
 def remove_background(
         mu,
@@ -165,7 +165,6 @@ def remove_background(
         animation=False,
         rho=0.2,
         color_space=cv2.COLOR_BGR2GRAY, channels=(0)):
-
     c = 0
     det_bb = []
     for i in tqdm(range(initial_frame, final_frame)):
@@ -187,7 +186,6 @@ def remove_background(
             frame = frame[:, :, channels]
         frame = np.ascontiguousarray(frame)
 
-
         if animation:
             rframe = cv2.resize(frame, (sy, sx))
             frames[c, ...] = rframe
@@ -200,6 +198,7 @@ def remove_background(
         imageio.mimsave('bg_removal_a{}_p{}_{}.gif'.format(alpha, rho, color_space), frames)
 
     return det_bb
+
 
 def denoise_bg(frame):
     kernel1 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
@@ -228,9 +227,10 @@ def bg_estimation(Method, **kwargs):
 
     return backSub
 
-def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
+
+def fg_segmentation_to_boxes(frame, i, img, box_min_size=(10, 10), cls='car'):
     frame = np.ascontiguousarray(frame * 255).astype(np.uint8)
-    contours,_ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     frame_dets = []
     foreground_mask_bbs = np.zeros(np.shape(frame))
     j = 1
@@ -239,14 +239,16 @@ def fg_segmentation_to_boxes(frame, i,img, box_min_size=(10, 10), cls='car'):
         if w > 110 and h > 110:
             frame_dets.append(BoundingBox(int(i), None, 'car', x, y, x + w, y + h, 1))
             j = j + 1
-            cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), thickness=2)
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2)
 
     return frame_dets, img
 
+
 def frames_to_gif(filename, frames):
-    #frames = frames.astype('uint8')
+    # frames = frames.astype('uint8')
 
     imageio.mimsave(filename, frames)
+
 
 def animation_2bb(name, format, gt_bb, bb_cords, frame_path, fps=10, seconds=10, ini=0, width=480, height=270):
     """
@@ -283,8 +285,6 @@ def animation_2bb(name, format, gt_bb, bb_cords, frame_path, fps=10, seconds=10,
             for x in gt_bb[ar]:
                 cv2.rectangle(frame1, (int(x.bbox[0]), int(x.bbox[1])),
                               (int(x.bbox[2]), int(x.bbox[3])), (0, 255, 0), 2)
-
-
 
         args_nogt = [i for i, num in enumerate(lst_nogt) if num == f_val]
         for ar in args_nogt:

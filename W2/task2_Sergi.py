@@ -66,7 +66,7 @@ def remove_bg2(
     # cv2.imshow("s", frame)
     # cv2.waitKey()
     if animation:
-        frames_to_gif('bg_removal_a{}_p{}_{}.gif'.format(alpha, rho, color_space), frames)
+        frames_to_gif('bg_removal_Adaptive_a{}_p{}_{}.gif'.format(alpha, rho, color_space), frames)
 
     return det_bb
 
