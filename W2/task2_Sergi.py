@@ -77,29 +77,45 @@ def task2():
 
     video_n_frames = len(glob.glob1(path_to_frames, "*.jpg"))
 
-    det_bb = remove_bg2(mu,
-                       sigma,
-                       2,
-                       path_to_frames,
-                       int(video_n_frames * 0.25),
-                       int(video_n_frames * 0.25 + 100),
-                       animation=True,
-                       adaptive=True,
-                       color_space=cv2.COLOR_BGR2GRAY)
+    alpha = [0.5, 0.8, 1, 1.5, 2, 2.3, 2.5, 3, 3.5, 4, 5, 7, 8]
+    r = [0.1, 0.2, 0.5, 1, 1.2, 1.5, 2]
+    map = []
+    for al in alpha:
+        a = []
+        for ro in r:
+            print('Alpha & rho = ', al, ro)
+            det_bb = remove_bg2(mu,
+                               sigma,
+                               al,
+                               path_to_frames,
+                               int(video_n_frames * 0.25),
+                               int(video_n_frames * 0.25 + 100),
+                               animation=False,
+                               adaptive=True,
+                               rho=ro,
+                               color_space=cv2.COLOR_BGR2GRAY)
 
 
-    reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/gt/gt.txt',initFrame=int(video_n_frames * 0.25), finalFrame=int(video_n_frames*0.25 +100))
-    gt = reader.get_annotations(classes=['car'], only_not_parked=True)
+            reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/gt/gt.txt',initFrame=int(video_n_frames * 0.25), finalFrame=int(video_n_frames*0.25 +100))
+            gt = reader.get_annotations(classes=['car'], only_not_parked=True)
 
-    bb_gt = []
-    # for frame in gt.keys():
-    for frame in range(int(video_n_frames * 0.25),  int(video_n_frames*0.25 +100)):
-        annotations = gt.get(frame, [])
-        bb_gt.append(annotations)
+            bb_gt = []
+            # for frame in gt.keys():
+            for frame in range(int(video_n_frames * 0.25),  int(video_n_frames*0.25 +100)):
+                annotations = gt.get(frame, [])
+                bb_gt.append(annotations)
 
 
-    ap, prec, rec = mean_average_precision(bb_gt , det_bb)
-    print(ap)
+            ap, prec, rec = mean_average_precision(bb_gt , det_bb)
+
+            a.append(ap)
+            print(a)
+        print(max(a))
+        map.append(max(a))
+
+    print(len(map))
+
+
 
 
 if __name__ == '__main__':
