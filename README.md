@@ -11,8 +11,8 @@
 
 - [x] T1.1 - Gaussian modelling
 - [x] T1.2 & 1.3 - Evaluate results
-- [ ] T2   - Adaptive modelling
-- [ ] T2.2 - Comparison adaptive vs non
+- [x] T2   - Adaptive modelling
+- [x] T2.2 - Comparison adaptive vs non
 - [x] T3   - Comparison with state-of-the-art 
 - [x] T4   - Color
 
