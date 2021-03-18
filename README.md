@@ -9,11 +9,6 @@
 
 ## Tasks W3 (from slides):
 
-Task 2.1: Tracking by Overlap
-Task 2.2: Tracking with a Kalman Filter
-Task 2.3: IDF1 score
-
-
 - [ ] T1.1 - Off-the-shelf
 - [ ] T1.2 - Fine-tune to your data
 - [ ] T2.1 - Tracking by Overlap
