@@ -3,10 +3,10 @@ from utilsw2 import *
 from Reader import *
 import cv2
 from Adapted_voc_evaluation import *
-path_to_video = 'datasets/AICity_data/train/S03/c010/vdo.avi'
-path_to_frames = 'datasets/frames/'
-results_path = 'Results/Task1_1'
-path_to_roi = 'datasets/AICity_data/train/S03/c010/roi.jpg'
+path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
+path_to_frames = '../datasets/frames/'
+results_path = '../Results/Task1_1'
+path_to_roi = '../datasets/AICity_data/train/S03/c010/roi.jpg'
 
 def task1_1(result_path, path_video, save_frames, color_space=cv2.COLOR_BGR2GRAY):
 
