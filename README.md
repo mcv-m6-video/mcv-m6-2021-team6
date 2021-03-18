@@ -7,14 +7,19 @@
 </ul>
 
 
-## Tasks W2 (from slides):
+## Tasks W3 (from slides):
 
-- [x] T1.1 - Gaussian modelling
-- [x] T1.2 & 1.3 - Evaluate results
-- [x] T2   - Adaptive modelling
-- [x] T2.2 - Comparison adaptive vs non
-- [x] T3   - Comparison with state-of-the-art 
-- [x] T4   - Color
+Task 2.1: Tracking by Overlap
+Task 2.2: Tracking with a Kalman Filter
+Task 2.3: IDF1 score
+
+
+- [ ] T1.1 - Off-the-shelf
+- [ ] T1.2 - Fine-tune to your data
+- [ ] T2.1 - Tracking by Overlap
+- [ ] T2.2 - Tracking with a Kalman Filter
+- [ ] T2.3 - IDF1 score
+
 
 ## Setting up environment
 
