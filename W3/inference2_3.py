@@ -286,14 +286,39 @@ def compare_both (annotations, predictions):
 # IN TYPE 1: We use the first output format
 def do_experiments_type1(cfg, predictor, train_images):
     results = []
-    for im_path in train_images:
+    predictions = []
+    for index, im_path in enumerate(train_images):
         im = cv2.imread(im_path)
         outputs = predictor(im)
-        # Just if you need visualize it.....
-        # v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
-        # out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-        # cv2_imshow(out.get_image()[:, :, ::-1])
-        results.append(output_to_csv_line(outputs))
+        row = [index, outputs]
+        # print (index)
+        predictions.append(row)
+
+    # we strip the predictions in order to have in a similar format to the annotations file
+    predictions = manage_predictions(predictions)
+
+    ## loading dataset annotations
+    dataset_dicts = []
+    # TODO: The following liens should be adapted
+    # Load the dataset and read it
+    anottations_dataset = "HEY, I NEED TO BE ADAPTED"       # here shoud be a call to receive the annotations from the AICITY CHALLENGE
+    print(anottations_dataset)
+
+    # then, convert it to same format as predictions
+    annotations_dataset = manage_annotations(anottations_dataset)
+
+    # TODO: Once you've created the annotations & loaded all.... you can save
+    save_as_pickle("annotations.pckl", annotations_dataset)
+    save_as_pickle("predictions.pckl", predictions)
+
+    # TODO: If you've already save it and generate it before
+    # TODO: Everything can be done more elegant by checking if a file of specific format is in path or not... and then
+    #       loading or saving accordingly
+    anottations_dataset = pickle.load(open('anotattions.pckl', 'rb'))
+    predictions = pickle.load(open('predictions.pckl', 'rb'))
+
+    # TODO: The method that will compare both frames_list
+    compare_both(anottations_dataset, predictions)
 
 # IN TYPE 2: We use the second output format, focused on weights with panda formats
 def do_experiments_type2(cfg, predictor, train_images):
