@@ -144,6 +144,11 @@ def output_to_csv_line_only_scores(line):
     final_result = prob2
     return final_result
 
+# POST: Sugar for writting lists to files
+def write_to_file(data, path):
+    with open(path, 'w') as f:
+        for i in data:
+            print(i, file=f)
 
 # POST: Given a PATH and a file pattern (e.g: *jpg) it creates you a list of image_paths
 def list_images_from_path(path, pattern):
