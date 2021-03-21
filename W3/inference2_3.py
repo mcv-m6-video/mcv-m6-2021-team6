@@ -111,10 +111,13 @@ def output_to_csv_line(line):
     return final_result
 
 # POST: In this 2nd version of the output to csv we use just scores, separated by whitespaces
-def output_to_csv_line_only_scores(output):
+#       This method is intended to be used in pd. format
+def output_to_csv_line_only_scores(line):
+    warnings.warn("Method (output_to_csv_only_scores) has been deprecated in W3. Build another one!")
     # Get full string
-    text = str(output)
+    text = str(line)
     # delete endlines
+    # TODO : The following line can be improved with a expression like: re.sub(r"[\n\t\s]*", "", text_type) or ''.join(text_type)
     text = text.replace('\n','').replace('\r','')
     # delete first part of the string, till num of instances
     nInstances1 = text[text.find("=")+1:]
