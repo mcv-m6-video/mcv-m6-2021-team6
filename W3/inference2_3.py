@@ -57,6 +57,10 @@ import os
 from fnmatch import fnmatch
 import time
 
+
+import warnings
+
+
 """
 ██╗  ██╗███████╗██╗     ██████╗ ███████╗██████╗ ███████╗
 ██║  ██║██╔════╝██║     ██╔══██╗██╔════╝██╔══██╗██╔════╝
@@ -71,12 +75,20 @@ import time
 When converting: outputs["instances"].to("cpu") to string, the expected result is:
 
 {'instances': Instances(num_instances=1, image_height=256, image_width=256, fields=[pred_boxes: Boxes(tensor([[167.9608, 182.4473, 184.4191, 195.6117]], device='cuda:0')), scores: tensor([0.7329], device='cuda:0'), pred_classes: tensor([8], device='cuda:0')])}
+This method was used on first releases to create a file with the following format:
+                                 |
+   each line of file == id_frame |  num_objects ;  list_of_probabibilities ; list_of_classes
+      that means. 1000 frames =  |
+      file of 1000 lines         |
 """
 # POST: When receiving the output, it makes a string conversions to obtain a simplified string and then use it in CSV
-def output_to_csv_line(output):
+#       Input is a string retreived from the command:     outputs["instances"].to("cpu")
+def output_to_csv_line(line):
+    warnings.warn("Method (output_to_csv_line) has been deprecated in W3. Build another one!")
     # Get full string
-    text = str(output)
+    text = str(line)
     # delete endlines
+    # TODO : This can be improved with a expression like: re.sub(r"[\n\t\s]*", "", text_type) or ''.join(text_type)
     text = text.replace('\n','').replace('\r','')
     # delete first part of the string, till num of instances
     nInstances1 = text[text.find("=")+1:]
