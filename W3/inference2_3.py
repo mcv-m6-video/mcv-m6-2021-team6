@@ -154,7 +154,7 @@ def write_to_file(data, path):
 # NOTE: I usually save pckl in the same directory, but if you prefer path should work too
 #       End your files / path with: .pckl
 def save_as_pickle(name_path, var):
-    f = open('name_path', 'wb')
+    f = open(name_path, 'wb')
     pickle.dump(var, f)
     f.close()
 
