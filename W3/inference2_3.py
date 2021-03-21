@@ -56,7 +56,7 @@ import glob
 import os
 from fnmatch import fnmatch
 import time
-
+import re
 
 import warnings
 
@@ -198,6 +198,67 @@ def manage_annotations(input):
 
     #print ("Final annotations have been processed")
     #print ("With a size of: " + str(len(load)))
+
+    return output
+
+# PRE:  input should be: [id_frame, prediction_from_detectron]
+# POST: It manages the transformation of different Instances present in a list with its given id_frame
+#       As Instances are generated one for each frame with the predictor
+#       This method splits each object and bbox to a unique line
+#       So the format will be:
+#         id_frame, bbox, score, class  [similar to the annotation one]
+def manage_predictions(input):
+    output = []
+
+    ## input should be: [id_frame, prediction_from_detectron]
+    for index, line in input:
+        type = line["instances"].get("pred_classes")
+        bbox = line["instances"].get("pred_boxes")
+        scores = line["instances"].get("scores")
+
+        types = []
+        bboxes = []
+        score_list = []
+
+        # Treat each type of data
+        # type of class (aka. pred_classes)
+        text_type = str(type)                       # Noisy text: tensor at beginning + cuda at the end
+        t10 = re.sub(r"[\n\t\s]*", "", text_type)   # Removing all spaces. Equivalent to ''.join(text_type)
+        t11 = t10.replace("tensor([", "")           # Deleting first part
+        t12 = t11.replace("],device=\'cuda:0\')", "")   # Deleting last part
+        regex_pattern = '\d{1,3}(?:,\d{3})*'  # REGEX: 1 to 3 digits; followed by 0 or more the non capture group comma followed by 3 digits - https://www.reddit.com/r/regex/comments/90g73v/identifying_comma_separated_numbers/
+        for match in re.finditer(regex_pattern, t12):
+            sGroup = match.group()
+            types.append(sGroup)
+
+        # bbox
+        text_bbox = str(bbox)
+        b10 = re.sub(r"[\n\t\s]*", "", text_bbox)   # Removing all spaces. Equivalent to ''.join(text_type)
+        b11 = b10.replace("tensor([", "")           # Removing just the first "brackets" of tensor([
+        regex_pattern = '\[(.*?)\]'                 # and taking content between brackets of the rest
+        for match in re.finditer(regex_pattern, b11):
+            sGroup = match.group()
+            bboxes.append(sGroup)
+
+        # scores
+        text_scores = str(scores)                   # Very similar to first case, types.
+        s10 = re.sub(r"[\n\t\s]*", "", text_scores)
+        s11 = s10.replace("tensor([", "")
+        s12 = s11.replace("],device=\'cuda:0\')", "")
+        regex_pattern = '[+-]?([0-9]*[.])?[0-9]+'  # REGEX: https://stackoverflow.com/questions/12643009/regular-expression-for-floating-point-numbers
+        for match in re.finditer(regex_pattern, s12):
+            sGroup = match.group()
+            score_list.append(sGroup)
+
+        ## ASSERT All list should have the same length
+        if (len(score_list)!=len(bboxes) or len(score_list)!=len(types)):       #score_list is the most buggy candidate. Check same size among others
+            raise AssertionError("Some differences have been found in regex. Please, check the patterns")
+
+        # generating the output with index == id_frame. Looping along internal lists of same length
+        for index2 in range(len(types)):
+            # frame_id = Retrieved by index of first loop; [bbox]; score; type
+            row = [index, bboxes[index2], score_list[index2], types[index2]]
+            output.append(row)
 
     return output
 
