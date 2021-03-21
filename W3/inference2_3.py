@@ -57,7 +57,7 @@ import os
 from fnmatch import fnmatch
 import time
 import re
-
+import pickle
 import warnings
 
 
@@ -149,6 +149,14 @@ def write_to_file(data, path):
     with open(path, 'w') as f:
         for i in data:
             print(i, file=f)
+
+# POST: More sugar to write a var to .pckl format
+# NOTE: I usually save pckl in the same directory, but if you prefer path should work too
+#       End your files / path with: .pckl
+def save_as_pickle(name_path, var):
+    f = open('name_path', 'wb')
+    pickle.dump(var, f)
+    f.close()
 
 # POST: Given a PATH and a file pattern (e.g: *jpg) it creates you a list of image_paths
 def list_images_from_path(path, pattern):
