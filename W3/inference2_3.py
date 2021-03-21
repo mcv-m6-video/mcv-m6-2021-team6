@@ -163,10 +163,15 @@ def calculate_performance(t1, t2, nImages):
 
 
 # POST: Encapsulating the generation
+#       Which means this is the Detectron class constructor
+# TODO: Check which signature and parameters are required to filter the output.
+# TODO: I don't know at the time of writting these lines if is it possible to filter by size, or class. Maybe yes.
 def generate_predictor(threshold, model):
     cfg = get_cfg()  # get a fresh new config
     cfg.merge_from_file(model_zoo.get_config_file(model))
     # AIXO ES IMPORTANT! Si baixes el threshold, et surtiran més deteccions
+    # TODO: Review the following line. It has been used untill now changing the model.... but I don't know
+    # TODO: what might happen when modifying this internal .RETINANET & .ROI_HEADS attributes
     cfg.MODEL.RETINANET.SCORE_THRESH_TEST = threshold
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model)
