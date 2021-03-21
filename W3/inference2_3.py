@@ -181,6 +181,26 @@ def generate_predictor(threshold, model):
 
     return cfg, predictor
 
+# POST: It manages the input of a loaded annotations file from .txt. Input is a given dictionary
+#       The output format of the annotation is: id_frame; bbox; category_id
+#
+# TODO: NEW! Needs adaptation?
+# TODO: As it's an annotation... the score of each bbox should be 1 = 100%
+def manage_annotations(input):
+    output = []
+    for dict in input:
+        frame_related = dict["image_id"]
+        for annot in dict["annotations"]:  #
+            type = annot["category_id"]
+            bbox = annot["bbox"]
+
+            output.append([frame_related,bbox,type])
+
+    #print ("Final annotations have been processed")
+    #print ("With a size of: " + str(len(load)))
+
+    return output
+
 # IN TYPE 1: We use the first output format
 def do_experiments_type1(cfg, predictor, train_images):
     results = []
