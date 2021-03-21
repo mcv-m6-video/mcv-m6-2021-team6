@@ -267,6 +267,14 @@ def manage_predictions(input):
 
     return output
 
+# POST: Given the annotations and predictions treated, it makes a comparisson.
+# TODO: for now it's just a signature method.
+def compare_both (annotations, predictions):
+
+    write_to_file(annotations, "anot_out.txt")
+    write_to_file(predictions, "pred_out.txt")
+
+
 # IN TYPE 1: We use the first output format
 def do_experiments_type1(cfg, predictor, train_images):
     results = []
