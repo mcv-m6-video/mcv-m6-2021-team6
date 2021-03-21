@@ -1,11 +1,15 @@
 from Reader import *
 from object_detection.DetectionModel import *
 
-def task1_1():
+def task1_1(model = None):
     reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
     gt = reader.get_annotations(classes=['car'])
 
-    detectionModel = DetectionModel('mask', '../datasets/AICity_data/train/S03/c010/vdo.avi')
+    detectionModel = None
+    if None:
+        detectionModel = DetectionModel('mask', '../datasets/AICity_data/train/S03/c010/vdo.avi')
+    else:
+        pass
     detectionModel.evaluation(gt)
     ap, prec, rec = detectionModel.get_metrics()
     print(f'Ap is {ap}')
@@ -13,5 +17,20 @@ def task1_1():
     print(f'Recall is {rec}')
     detectionModel.get_qualitative_metrics(gt)
 
+def task1_2():
+    detectionModel = DetectionModel('mask', '../datasets/AICity_data/train/S03/c010/vdo.avi',  finetune=True)
+    detectionModel.train()
+    with torch.no_grad():
+        for images, targets in detectionModel.test_loader:
+            images = [image.to(detectionModel.device) for image in images]
+            predictions = detectionModel.model(images)
+            for image, prediction in zip(images, predictions):
+                image = (image.to('cpu').numpy() * 255).astype(np.uint8).transpose((1, 2, 0))
+                image = np.ascontiguousarray(image)
+                boxes = prediction['boxes'].to('cpu').numpy().astype(np.int32)
+                for box in boxes:
+                    cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
+                cv2.imshow('predictions', image)
+                cv2.waitKey(0)
 if __name__ == '__main__':
-    task1_1()
+    task1_2()

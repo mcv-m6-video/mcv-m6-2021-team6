@@ -18,7 +18,7 @@ def mean_average_precision(y_true, y_pred, classes=None, sort_method=None):
     for cls in classes:
         # filter by class
         y_true_cls = [[det for det in boxlist if det.label == cls] for boxlist in y_true]
-        y_pred_cls = [[det for det in boxlist if det.label == cls] for boxlist in y_pred]
+        y_pred_cls = [[det for det in boxlist if det.label == cls.cpu()] for boxlist in y_pred]
         ap, prec, rec = average_precision(y_true_cls, y_pred_cls, sort_method)
         precs.append(prec)
         recs.append(rec)
