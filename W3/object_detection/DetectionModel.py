@@ -4,8 +4,10 @@ import cv2
 from torchvision.models import detection
 from torchvision.transforms import transforms
 import numpy as np
-from W3.BoundingBox import *
+import sys
+sys.path.append('..')
 from W3.UtilsW3 import *
+from W3.BoundingBox import *
 
 class DetectionModel:
     def __init__(self, model, dataPath, pretained = True, limit_frames = (0, 50)):
