@@ -276,6 +276,30 @@ def manage_predictions(input):
 
     return output
 
+def saving_old_stuff():
+    warnings.warn("This method was created as a backup of code. Build another one!")
+    ## loading dataset annotations
+    dataset_dicts = []
+    # TODO: The following liens should be adapted
+    # Load the dataset and read it
+    # anottations_dataset = "HEY, I NEED TO BE ADAPTED"       # here shoud be a call to receive the annotations from the AICITY CHALLENGE
+    # print(anottations_dataset)
+
+    # then, convert it to same format as predictions
+    # annotations_dataset = manage_annotations(anottations_dataset)
+
+    # TODO: Once you've created the annotations & loaded all.... you can save
+    # save_as_pickle("annotations.pckl", annotations_dataset)
+
+    # TODO: If you've already save it and generate it before
+    # TODO: Everything can be done more elegant by checking if a file of specific format is in path or not... and then
+    #       loading or saving accordingly
+    # anottations_dataset = pickle.load(open('anotattions.pckl', 'rb'))
+    # predictions = pickle.load(open('predictions.pckl', 'rb'))
+
+    # TODO: The method that will compare both frames_list
+    # compare_both(anottations_dataset, predictions)
+
 # POST: Given the annotations and predictions treated, it makes a comparisson.
 # TODO: for now it's just a signature method.
 def compare_both (annotations, predictions):
@@ -297,29 +321,7 @@ def do_experiments_type1(cfg, predictor, train_images):
 
     # we strip the predictions in order to have in a similar format to the annotations file
     predictions = manage_predictions(predictions)
-
-    ## loading dataset annotations
-    dataset_dicts = []
-    # TODO: The following liens should be adapted
-    # Load the dataset and read it
-    anottations_dataset = "HEY, I NEED TO BE ADAPTED"       # here shoud be a call to receive the annotations from the AICITY CHALLENGE
-    print(anottations_dataset)
-
-    # then, convert it to same format as predictions
-    annotations_dataset = manage_annotations(anottations_dataset)
-
-    # TODO: Once you've created the annotations & loaded all.... you can save
-    save_as_pickle("annotations.pckl", annotations_dataset)
     save_as_pickle("predictions.pckl", predictions)
-
-    # TODO: If you've already save it and generate it before
-    # TODO: Everything can be done more elegant by checking if a file of specific format is in path or not... and then
-    #       loading or saving accordingly
-    anottations_dataset = pickle.load(open('anotattions.pckl', 'rb'))
-    predictions = pickle.load(open('predictions.pckl', 'rb'))
-
-    # TODO: The method that will compare both frames_list
-    compare_both(anottations_dataset, predictions)
 
 # IN TYPE 2: We use the second output format, focused on weights with panda formats
 def do_experiments_type2(cfg, predictor, train_images):
@@ -363,8 +365,8 @@ def write_results(path, results):
 
 # We are using MIT dataset, the same as in M3
 
-PATH = "/home/mcv/datasets/KITTI-MOTS/"
-PATTERN = "*.png"
+PATH = "/home/group01/pycharm_tmp2/datasets/frames/"
+PATTERN = "*.jpg"
 
 # Get images
 images = list_images_from_path(PATH, PATTERN)
@@ -379,11 +381,26 @@ RETINANET_3 = "COCO-Detection/retinanet_R_101_FPN_3x.yaml"
 #  DIFFERENT EXPERIMENTS
 #
 ## 1: FASTER_RCNN_3x @ 0.5
-cfg, predictor = generate_predictor(0.5,FASTER_RCNN_3)
-reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
-gt = reader.get_annotations(classes=['car'])
+
+## GENERATE PREDICTIONS, LOAD ANNOTATIONS FROM FILES:
+'''
+#cfg, predictor = generate_predictor(0.5,FASTER_RCNN_3)
+#reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
+#gt = reader.get_annotations()
+#save_as_pickle("reader.pckl", reader)  # Saving the reader itself
+#save_as_pickle("gt.pckl", gt)          # Saving the converted annotations
+results = do_experiments_type1(cfg, predictor, images)      # We put inside to save the pickle
+'''
+
+## LOAD ANNOTATIONS FROM FILES:
+reader = pickle.load(open('reader.pckl', 'rb'))
+gt = pickle.load(open('gt.pckl', 'rb'))
+predictions = pickle.load(open('predictions.pckl', 'rb'))
+
+
 t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
+
+results = "Hey, I'm debugging"
 t1 = time.time()
 write_results('experiment1.csv',results)
 calculate_performance(t0,t1, len(images))
