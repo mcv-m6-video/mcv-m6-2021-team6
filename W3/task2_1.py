@@ -5,12 +5,12 @@ from track import *
 from Reader import *
 import glob
 
-path_to_video = 'datasets/AICity_data/train/S03/c010/vdo.avi'
-path_to_frames = 'datasets/frames/'
+path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
+path_to_frames = '../datasets/frames/'
 
-def task2_1(path_to_video, save_frames = False, path_to_frames = 'datasets/frames/'):
+def task2_1(path_to_video, save_frames = False, path_to_frames = '..datasets/frames/'):
     # Reading inputs.
-    #If you need to read the frames --> save_frames = True
+    # If you need to save the frames --> save_frames = True. False == reading from path
     if (save_frames):
         vidcap = cv2.VideoCapture(path_to_video)
         success, image = vidcap.read()
@@ -28,10 +28,10 @@ def task2_1(path_to_video, save_frames = False, path_to_frames = 'datasets/frame
 
 
     # Reading the groundtruth
-    reader = AICityChallengeAnnotationReader(path='datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml',initFrame=int(video_n_frames * 0.25), finalFrame=int(video_n_frames))
+    reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
     gt_file = reader.get_annotations(classes=['car'])
     # Reading our BB
-    reader = AICityChallengeAnnotationReader(path='datasets/AICity_data/train/S03/c010/det/det_yolo3.txt',initFrame=int(video_n_frames * 0.25), finalFrame=int(video_n_frames))
+    reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_yolo3.txt')
     det_file = reader.get_annotations(classes=['car'])
 
     tracks = []
