@@ -96,25 +96,43 @@ class DetectionModel:
         elif k_fold == 3:
             pass
 
-        # define training and validation data loaders
-        self.train_loader = torch.utils.data.DataLoader(dataset, batch_size=4, sampler=train_sampler, num_workers=1,
-                                                   collate_fn=collate_fn)
-        self.test_loader = torch.utils.data.DataLoader(dataset, batch_size=4, sampler=test_sampler, num_workers=1,
-                                                  collate_fn=collate_fn)
-        params = [p for p in self.model.parameters() if p.requires_grad]
-        optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+        total_size = len(dataset)
+        fraction = 1 / k_fold
+        seg = int(total_size * fraction)
+        # tr:train,val:valid; r:right,l:left;  eg: trrr: right index of right side train subset
+        # index: [trll,trlr],[vall,valr],[trrl,trrr]
+        for i in range(k_fold):
+            trll = 0
+            trlr = i * seg
+            vall = trlr
+            valr = i * seg + seg
+            trrl = valr
+            trrr = total_size
+            train_left_indices = list(range(trll, trlr))
+            train_right_indices = list(range(trrl, trrr))
 
-        y_prediction = None
-        for epoch in range(num_epochs):
-            train_one_epoch(self.model, optimizer, self.train_loader, self.device, epoch, print_freq=10)
-            lr_scheduler.step()
-            y_prediction = evaluate(self.model, self.test_loader, self.device)
+            train_indices = train_left_indices + train_right_indices
+            val_indices = list(range(vall, valr))
 
-        cpu_device = torch.device("cpu")
-        for x in y_prediction:
-            if len(x) != 0:
-                self.detections[x[0].frame] = [z for z in x]
+            # define training and validation data loaders
+            self.train_loader = torch.utils.data.DataLoader(dataset, batch_size=4, sampler=train_indices, num_workers=1,
+                                                       collate_fn=collate_fn)
+            self.test_loader = torch.utils.data.DataLoader(dataset, batch_size=4, sampler=val_indices, num_workers=1,
+                                                      collate_fn=collate_fn)
+            params = [p for p in self.model.parameters() if p.requires_grad]
+            optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
+            lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+
+            y_prediction = None
+            for epoch in range(num_epochs):
+                train_one_epoch(self.model, optimizer, self.train_loader, self.device, epoch, print_freq=10)
+                lr_scheduler.step()
+                y_prediction = evaluate(self.model, self.test_loader, self.device)
+
+            cpu_device = torch.device("cpu")
+            for x in y_prediction:
+                if len(x) != 0:
+                    self.detections[x[0].frame] = [z for z in x]
 
     def collate_fn(batch):
         return tuple(zip(*batch))
