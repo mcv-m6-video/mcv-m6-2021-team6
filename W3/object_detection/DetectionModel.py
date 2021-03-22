@@ -1,6 +1,8 @@
 from torchvision import models
 import torch
 import cv2
+import random
+
 import torchvision
 from torchvision.models import detection
 from torchvision.transforms import transforms
@@ -74,16 +76,25 @@ class DetectionModel:
 
             self.predictions.append(self.detections[i])
             self.ground_true.append(gt.get(i, []))
-    def train(self, num_epochs=1):
+    def train(self,k_fold = 1, num_epochs=1):
         transform = torchvision.transforms.ToTensor()
         dataset = CustomTorchDataset(gt_file= '../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml', root_dir=self.videoPath, transform=transform)
 
-        # split the dataset in train and test set
-        # indices = np.random.permutation(len(dataset))
-        indices = range(len(dataset))
-        split = int(len(dataset) * 0.25)
-        train_sampler = torch.utils.data.SubsetRandomSampler(indices[:split])
-        test_sampler = torch.utils.data.SubsetRandomSampler(indices[split:])
+        if k_fold == 1:
+            indices = range(len(dataset))
+            split = int(len(dataset) * 0.25)
+            train_sampler = torch.utils.data.SubsetRandomSampler(indices[:split])
+            test_sampler = torch.utils.data.SubsetRandomSampler(indices[split:])
+        elif k_fold == 2:
+            indices = range(len(dataset))
+            indices = list(indices)
+            random.shuffle(indices)
+            split = int(len(dataset) * 0.25)
+            train_sampler = torch.utils.data.SubsetRandomSampler(indices[:split])
+            test_sampler = torch.utils.data.SubsetRandomSampler(indices[split:])
+
+        elif k_fold == 3:
+            pass
 
         # define training and validation data loaders
         self.train_loader = torch.utils.data.DataLoader(dataset, batch_size=4, sampler=train_sampler, num_workers=1,
@@ -94,10 +105,16 @@ class DetectionModel:
         optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
+        y_prediction = None
         for epoch in range(num_epochs):
             train_one_epoch(self.model, optimizer, self.train_loader, self.device, epoch, print_freq=10)
             lr_scheduler.step()
-            evaluate(self.model, self.test_loader, self.device)
+            y_prediction = evaluate(self.model, self.test_loader, self.device)
+
+        cpu_device = torch.device("cpu")
+        for x in y_prediction:
+            if len(x) != 0:
+                self.detections[x[0].frame] = [z for z in x]
 
     def collate_fn(batch):
         return tuple(zip(*batch))

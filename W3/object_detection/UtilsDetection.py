@@ -187,7 +187,7 @@ def evaluate(model, data_loader, device):
     print("Averaged stats:", metric_logger)
 
     torch.set_num_threads(n_threads)
-
+    return y_pred
 class SmoothedValue(object):
     """Track a series of values and provide access to smoothed values over a
     window or the global series average.
