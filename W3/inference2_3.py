@@ -59,6 +59,7 @@ import time
 import re
 import pickle
 import warnings
+from Reader import *
 
 
 """
@@ -375,197 +376,18 @@ FASTER_RCNN_3 = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
 RETINANET_3 = "COCO-Detection/retinanet_R_101_FPN_3x.yaml"
 
 ###
-#  FIRST 6 experiments: [0.25, 0.50, 0.75] combined on RetinaNET x1
+#  DIFFERENT EXPERIMENTS
 #
-## 1: RetinaNet @ 0.25
-cfg, predictor = generate_predictor(0.25,RETINANET)
+## 1: FASTER_RCNN_3x @ 0.5
+cfg, predictor = generate_predictor(0.5,FASTER_RCNN_3)
+reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
+gt = reader.get_annotations(classes=['car'])
 t0 = time.time()
 results = do_experiments_type1(cfg, predictor, images)
 t1 = time.time()
 write_results('experiment1.csv',results)
 calculate_performance(t0,t1, len(images))
 
-## 2: RetinaNet @ 0.5
-cfg, predictor = generate_predictor(0.5,RETINANET)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment2.csv',results)
-calculate_performance(t0,t1, len(images))
 
-## 3: RetinaNet @ 0.7
-cfg, predictor = generate_predictor(0.7,RETINANET)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment3.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 4: FASTER_RCNN @ 0.25
-cfg, predictor = generate_predictor(0.25,FASTER_RCNN)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment4.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 5: FASTER_RCNN @ 0.5
-cfg, predictor = generate_predictor(0.5,FASTER_RCNN)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment5.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 6: FASTER_RCNN @ 0.7
-cfg, predictor = generate_predictor(0.7,FASTER_RCNN)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment6.csv',results)
-calculate_performance(t0,t1, len(images))
-
-##
-# SECOND 6 experiments: [0.25, 0.50, 0.75] combined on RetinaNET x3
-# Yes, x3 format
-#
-
-## 1: RetinaNet @ 0.25
-cfg, predictor = generate_predictor(0.25,RETINANET_3)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment11.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 2: RetinaNet @ 0.5
-cfg, predictor = generate_predictor(0.5,RETINANET_3)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment12.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 3: RetinaNet @ 0.7
-cfg, predictor = generate_predictor(0.7,RETINANET_3)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment13.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 4: FASTER_RCNN @ 0.25
-cfg, predictor = generate_predictor(0.25,FASTER_RCNN_3)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment14.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 5: FASTER_RCNN @ 0.5
-cfg, predictor = generate_predictor(0.5,FASTER_RCNN_3)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment15.csv',results)
-calculate_performance(t0,t1, len(images))
-
-## 6: FASTER_RCNN @ 0.7
-cfg, predictor = generate_predictor(0.7,FASTER_RCNN_3)
-t0 = time.time()
-results = do_experiments_type1(cfg, predictor, images)
-t1 = time.time()
-write_results('experiment16.csv',results)
-calculate_performance(t0,t1, len(images))
-
-
-# Get images  [Whole Dataset]
-# Now, instead of using just a selection, we took the whole dataset
-images = list_images_from_path("/home/mcv/m5/datasets/MIT_split/train", PATTERN)
-
-'''
-
-### GERMAN EXPERIMENTS & OUTPUT
-### WORKING ON THE SCORES DISTRIBUTION
-## ALL THRESHOLD = 0
-
-# The Whole Dataset
-PATH = "/home/mcv/m5/datasets/MIT_split/"
-PATTERN = "*.jpg"
-
-# Get images
-images = list_images_from_path(PATH, PATTERN)
-
-# Models to analize
-FASTER_1 = "COCO-Detection/faster_rcnn_R_50_FPN_1x.yaml"
-RETINANET_1 = "COCO-Detection/retinanet_R_50_FPN_1x.yaml"
-
-FASTER_101 = "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml"
-RETINANET_101 = "COCO-Detection/retinanet_R_101_FPN_3x.yaml"
-
-FASTER_XXX = "COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"
-
-FASTER_1_3x = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
-RETINANET_1_3x = "COCO-Detection/retinanet_R_50_FPN_3x.yaml"
-
-
-# G1 = FASTER_1
-cfg, predictor = generate_predictor(0, FASTER_1)
-t0 = time.time()
-results = do_experiments_type2(cfg, predictor, images)
-t1 = time.time()
-write_results('Faster_1.csv',results)
-calculate_performance(t0,t1, len(images))
-
-# G2 = RETINANET_1
-cfg, predictor = generate_predictor(0, RETINANET_1)
-t0 = time.time()
-results = do_experiments_type2(cfg, predictor, images)
-t1 = time.time()
-write_results('Retinanet_1.csv',results)
-calculate_performance(t0,t1, len(images))
-
-# G3 = FASTER_101
-cfg, predictor = generate_predictor(0, FASTER_101)
-t0 = time.time()
-results = do_experiments_type2(cfg, predictor, images)
-t1 = time.time()
-write_results('Faster_101.csv',results)
-calculate_performance(t0,t1, len(images))
-
-# G4 = RETINANET_101
-cfg, predictor = generate_predictor(0, RETINANET_101)
-t0 = time.time()
-results = do_experiments_type2(cfg, predictor, images)
-t1 = time.time()
-write_results('Retinanet_101.csv',results)
-calculate_performance(t0,t1, len(images))
-
-# G5 = FASTER_XXX
-cfg, predictor = generate_predictor(0, FASTER_XXX)
-t0 = time.time()
-results = do_experiments_type2(cfg, predictor, images)
-t1 = time.time()
-write_results('Faster_XXX.csv',results)
-calculate_performance(t0,t1, len(images))
-
-
-# G6 = FASTER_1 x3
-cfg, predictor = generate_predictor(0, FASTER_1_3x)
-t0 = time.time()
-results = do_experiments_type2(cfg, predictor, images)
-t1 = time.time()
-write_results('Faster_1_3x.csv',results)
-calculate_performance(t0,t1, len(images))
-
-# G7 = RETINANET_1 x3
-cfg, predictor = generate_predictor(0, RETINANET_1_3x)
-t0 = time.time()
-results = do_experiments_type2(cfg, predictor, images)
-t1 = time.time()
-write_results('Retinanet_1_3x.csv',results)
-calculate_performance(t0,t1, len(images))
-
-'''
 print("Hey, I'm done here!")
 
