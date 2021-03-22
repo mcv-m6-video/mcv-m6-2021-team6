@@ -23,10 +23,7 @@ class Track(object):
 
     def last_detection(self):
         return self.detections[-1]
-
-    def last_detection2(self):
-        return self.detections[-2]
-
+    
     def set_prev_track(self, track):
         self.prev_track = track
 
