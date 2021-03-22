@@ -6,12 +6,12 @@ def task1_1(model = None):
     gt = reader.get_annotations(classes=['car'])
 
     detectionModel = None
-    if None:
-        detectionModel = DetectionModel('mask', '../datasets/AICity_data/train/S03/c010/vdo.avi')
+    if model == None:
+        detectionModel = DetectionModel('fast', '../datasets/AICity_data/train/S03/c010/vdo.avi')
     else:
         pass
     detectionModel.evaluation(gt)
-    ap, prec, rec = detectionModel.get_metrics()
+    ap, prec, rec = detectionModel.get_metrics(False)
     print(f'Ap is {ap}')
     print(f'Precision is {prec}')
     print(f'Recall is {rec}')
@@ -36,4 +36,5 @@ def task1_2(k_fold = 1 ):
                 cv2.imshow('predictions', image)
                 cv2.waitKey(0)
 if __name__ == '__main__':
-    task1_2(2)
+    task1_1()
+    #task1_2(2)

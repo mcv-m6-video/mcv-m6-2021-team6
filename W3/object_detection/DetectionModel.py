@@ -29,6 +29,8 @@ class DetectionModel:
         model = None
         if (model_name == 'mask'):
             model = detection.maskrcnn_resnet50_fpn(pretrained = pretained)
+        elif model_name == 'fast':
+            model = detection.fasterrcnn_resnet50_fpn(pretrained=pretained)
         if finetune:
             # get number of input features for the classifier
             in_features = model.roi_heads.box_predictor.cls_score.in_features
@@ -137,8 +139,8 @@ class DetectionModel:
     def collate_fn(batch):
         return tuple(zip(*batch))
 
-    def get_metrics(self):
-        ap, prec, rec = mean_average_precision(self.ground_true, self.predictions, classes=['car'])
+    def get_metrics(self, is_cpu = True):
+        ap, prec, rec = mean_average_precision(self.ground_true, self.predictions, classes=['car'], is_cpu=is_cpu)
         return ap, prec, rec
 
     def get_qualitative_metrics(self, gt):
