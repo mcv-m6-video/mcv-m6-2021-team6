@@ -42,7 +42,6 @@ class AICityChallengeAnnotationReader:
 
         return detections
 
-
 def parse_annotations(path):
     root, ext = os.path.splitext(path)
 
