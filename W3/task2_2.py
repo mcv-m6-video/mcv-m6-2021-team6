@@ -48,13 +48,14 @@ class Detector(object):
             bbox_xcycwh, cls_conf, cls_ids = self.detectron2.detect(im)
 
             if bbox_xcycwh is not None:
-                # select class person
-                #mask = cls_ids == 0
+                # select class CAR....
+                # in Detectron is classified by class 2. Note that other similar like :: truck can be of interest
+                mask = cls_ids == 2
                 try:
-                    #bbox_xcycwh = bbox_xcycwh[mask]
+                    bbox_xcycwh = bbox_xcycwh[mask]
                     bbox_xcycwh[:, 3:] *= 1.2
 
-                    #cls_conf = cls_conf[mask]
+                    cls_conf = cls_conf[mask]
                     outputs = self.deepsort.update(bbox_xcycwh, cls_conf, im)
                     if len(outputs) > 0:
                         bbox_xyxy = outputs[:, :4]
