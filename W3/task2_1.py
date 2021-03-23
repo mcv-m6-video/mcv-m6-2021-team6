@@ -30,6 +30,12 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
     # Reading the groundtruth
     reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
     gt_file = reader.get_annotations(classes=['car'])
+
+    gt_bb = []
+    for frame in gt_file.keys():
+        annotations = gt_file.get(frame, [])
+        gt_bb.append(annotations)
+
     # Reading our BB
     if neural_network == 1:
         reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')
@@ -41,6 +47,7 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
     det_file = reader.get_annotations(classes=['car'])
 
     tracks = []
+    bb_frames = []
     max_track = 0
     i = 0
     for frame in det_file.keys():
@@ -87,15 +94,26 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
                 cv2.rectangle(img, (int(det.xtl), int(det.ytl)), (int(det.xbr), int(det.ybr)), track.color, 2)
                 for c in track.detections:
                     cv2.circle(img, c.center, 5, track.color, -1)
+        if False:
+            cv2.imshow('tracking detections', cv2.resize(img, (900, 600)))
+            if cv2.waitKey(10) & 0xFF == ord('q'):
+                break
 
-        cv2.imshow('tracking detections', cv2.resize(img, (900, 600)))
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        bb_frames.append(frame_det)
+    ap, prec, rec = mean_average_precision(gt_bb, bb_frames)
 
-    cv2.destroyAllWindows()
+    if neural_network == 1:
+        print('Mask_RCNN AP: ', ap)
+    elif neural_network == 2:
+        print('SSD512 AP: ', ap)
+    elif neural_network == 3:
+        print('YOLO3 AP: ', ap)
 
+
+cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     # Neural Network : 1 = Mask_r_cnn, 2 = SSD, 3 = Yolo
-    task2_1(path_to_video, save_frames=False,
-            path_to_frames=path_to_frames, neural_network=3)
+    for n in range(1, 4):
+        task2_1(path_to_video, save_frames=False,
+                path_to_frames=path_to_frames, neural_network=n)
