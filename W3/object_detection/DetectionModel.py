@@ -7,10 +7,13 @@ import torchvision
 from torchvision.models import detection
 from torchvision.transforms import transforms
 import numpy as np
-from W3.BoundingBox import *
+import sys
+sys.path.append('..')
 from W3.UtilsW3 import *
+
 from object_detection.CustomTorchDataset import *
 from object_detection.UtilsDetection import *
+
 class DetectionModel:
     def __init__(self, model, dataPath, pretained = True,finetune = False, limit_frames = (0, 50)):
         self.name_model = model

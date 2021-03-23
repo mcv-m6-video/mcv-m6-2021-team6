@@ -9,10 +9,11 @@
 
 ## Tasks W3 (from slides):
 
-- [ ] T1.1 - Off-the-shelf
-- [ ] T1.2 - Fine-tune to your data
-- [ ] T2.1 - Tracking by Overlap
-- [ ] T2.2 - Tracking with a Kalman Filter
+- [X] T1.1 - Off-the-shelf
+- [X] T1.2 - Fine-tune to your data
+- [ ] T1.3 - K-fold validation
+- [X] T2.1 - Tracking by Overlap
+- [X] T2.2 - Tracking with a Kalman Filter   (DeepSort)
 - [ ] T2.3 - IDF1 score
 
 
