@@ -1,5 +1,5 @@
 import os
-import cv2 as cv2
+import cv2
 from Adapted_voc_evaluation import *
 from track import *
 from Reader import *
@@ -8,10 +8,11 @@ import glob
 path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
 path_to_frames = '../datasets/frames/'
 
-def task2_1(path_to_video, save_frames = False, path_to_frames = '..datasets/frames/'):
+
+def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/', neural_network=1):
     # Reading inputs.
     # If you need to save the frames --> save_frames = True. False == reading from path
-    if (save_frames):
+    if save_frames:
         vidcap = cv2.VideoCapture(path_to_video)
         success, image = vidcap.read()
         count = 1
@@ -26,12 +27,17 @@ def task2_1(path_to_video, save_frames = False, path_to_frames = '..datasets/fra
 
     video_n_frames = len(glob.glob1(path_to_frames, "*.jpg"))
 
-
     # Reading the groundtruth
     reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
     gt_file = reader.get_annotations(classes=['car'])
     # Reading our BB
-    reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_yolo3.txt')
+    if neural_network == 1:
+        reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')
+    elif neural_network == 2:
+        reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_ssd512.txt')
+    elif neural_network == 3:
+        reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_yolo3.txt')
+
     det_file = reader.get_annotations(classes=['car'])
 
     tracks = []
@@ -45,17 +51,17 @@ def task2_1(path_to_video, save_frames = False, path_to_frames = '..datasets/fra
         frame_tracks = []
 
         for track in tracks:
-            #Comparing the detections of the current frame with the previous frame and choose the better matched
+            # Comparing the detections of the current frame with the previous frame and choose the better matched
             matched_det = matched_bbox(track.last_detection(), det)
 
-            #Needs five consecutive matches (five previous frames)
+            # Needs five consecutive matches (five previous frames)
             if matched_det:
                 track.buffer += 1
                 det.remove(matched_det)
                 if track.buffer > 4:
                     track.add_detection(matched_det)
                     frame_tracks.append(track)
-            #Removing the cars that disappear from the frames
+            # Removing the cars that disappear from the frames
             if not matched_det and track.id < max_track:
                 track.count = track.count + 1
                 if track.count > 5:
@@ -88,5 +94,8 @@ def task2_1(path_to_video, save_frames = False, path_to_frames = '..datasets/fra
 
     cv2.destroyAllWindows()
 
+
 if __name__ == '__main__':
-    task2_1(path_to_video, save_frames = False, path_to_frames = path_to_frames)
+    # Neural Network : 1 = Mask_r_cnn, 2 = SSD, 3 = Yolo
+    task2_1(path_to_video, save_frames=False,
+            path_to_frames=path_to_frames, neural_network=3)
