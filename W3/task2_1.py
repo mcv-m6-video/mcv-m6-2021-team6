@@ -9,7 +9,7 @@ path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
 path_to_frames = '../datasets/frames/'
 
 
-def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/', neural_network=1):
+def task2_1(path_to_video, save_frames=False, path_to_frames='../datasets/frames/', neural_network=1):
     # Reading inputs.
     # If you need to save the frames --> save_frames = True. False == reading from path
     if save_frames:
@@ -32,29 +32,34 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
     gt_file = reader.get_annotations(classes=['car'])
 
     gt_bb = []
-    for frame in gt_file.keys():
+    for frame in range(int(video_n_frames * 0.25), int(video_n_frames)):
         annotations = gt_file.get(frame, [])
         gt_bb.append(annotations)
 
     # Reading our BB
     if neural_network == 1:
-        reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')
+        reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det.txt')
     elif neural_network == 2:
         reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_ssd512.txt')
     elif neural_network == 3:
+        reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')
+    elif neural_network == 4:
         reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_yolo3.txt')
 
     det_file = reader.get_annotations(classes=['car'])
 
-    tracks = []
     bb_frames = []
+    tracks = []
     max_track = 0
-    i = 0
-    for frame in det_file.keys():
-        img = cv2.imread(path_to_frames + ('/frame_{:04d}.jpg'.format(i + 1)))
-        i = i + 1
+    for frame in range(int(video_n_frames * 0.25), int(video_n_frames)):
+        if neural_network == 1:
+            det = det_file.get((frame - int(video_n_frames * 0.25)), [])
+            img = cv2.imread(path_to_frames + ('/frame_{:04d}.jpg'.format(frame)))
+        else:
+            det = det_file.get(frame, [])
+            img = cv2.imread(path_to_frames + ('/frame_{:04d}.jpg'.format(frame + 1)))
+
         # Getting all the detections on the frame
-        det = det_file.get(frame, [])
         frame_tracks = []
 
         for track in tracks:
@@ -65,13 +70,13 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
             if matched_det:
                 track.buffer += 1
                 det.remove(matched_det)
-                if track.buffer > 4:
+                if track.buffer >= 4:
                     track.add_detection(matched_det)
                     frame_tracks.append(track)
             # Removing the cars that disappear from the frames
             if not matched_det and track.id < max_track:
                 track.count = track.count + 1
-                if track.count > 5:
+                if track.count >= 4:
                     tracks.remove(track)
                     try:
                         frame_tracks.remove(track)
@@ -83,7 +88,6 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
             new_bb.id = max_track + 1
             new_track = Track(max_track + 1, [new_bb])
             tracks.append(new_track)
-            frame_tracks.append(new_track)
             max_track += 1
 
         frame_det = []
@@ -92,6 +96,7 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
             frame_det.append(det)
             if True:
                 cv2.rectangle(img, (int(det.xtl), int(det.ytl)), (int(det.xbr), int(det.ybr)), track.color, 2)
+                cv2.putText(img, str(track.id), org=(int(det.xtl),int(det.ytl)), fontFace = cv2.FONT_HERSHEY_SIMPLEX, fontScale = 1, color = track.color, thickness = 2)
                 for c in track.detections:
                     cv2.circle(img, c.center, 5, track.color, -1)
         if False:
@@ -100,20 +105,29 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='..datasets/frames/
                 break
 
         bb_frames.append(frame_det)
+
+    iou = compute_iou_over_time(gt_bb, bb_frames)
+
     ap, prec, rec = mean_average_precision(gt_bb, bb_frames)
 
     if neural_network == 1:
-        print('Mask_RCNN AP: ', ap)
+        print('Mask_FineTune AP: ', ap)
+        print('Mask_FineTune IoU: ', iou[0])
     elif neural_network == 2:
         print('SSD512 AP: ', ap)
+        print('SSD512 IoU: ', iou[0])
     elif neural_network == 3:
+        print('Mask_RCNN AP: ', ap)
+        print('Mask_RCNN IoU: ', iou[0])
+    elif neural_network == 4:
         print('YOLO3 AP: ', ap)
+        print('YOLO3 IoU: ', iou[0])
 
 
 cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    # Neural Network : 1 = Mask_r_cnn, 2 = SSD, 3 = Yolo
-    for n in range(1, 4):
+    # Neural Network : 1 = Mask_r_cnn FineTune,  2 = SSD, 3 = Mask_r_cnn, 4 = Yolo
+    for n in range(1, 5):
         task2_1(path_to_video, save_frames=False,
                 path_to_frames=path_to_frames, neural_network=n)
