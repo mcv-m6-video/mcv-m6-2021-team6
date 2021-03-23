@@ -1,5 +1,6 @@
 from Reader import *
 from object_detection.DetectionModel import *
+
 from object_detection.UtilsDetection import *
 def task1_1(model = None):
     reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
@@ -16,6 +17,7 @@ def task1_1(model = None):
     print(f'Precision is {prec}')
     print(f'Recall is {rec}')
     detectionModel.get_qualitative_metrics(gt)
+
 
 def task1_2(k_fold = 1 ):
     detectionModel = DetectionModel('mask', '../datasets/AICity_data/train/S03/c010/vdo.avi',  finetune=True)
@@ -35,6 +37,7 @@ def task1_2(k_fold = 1 ):
                     cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
                 cv2.imshow('predictions', image)
                 cv2.waitKey(0)
+
 if __name__ == '__main__':
     task1_1()
     #task1_2(2)
