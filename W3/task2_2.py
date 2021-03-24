@@ -7,7 +7,11 @@ import cv2
 
 from deep_sort import DeepSort
 from Detectron2_2 import Detectron2
-from UtilsW3 import draw_bboxes
+from UtilsW3 import draw_bboxes, Detection
+from Reader import *
+from evaluation.idf1 import MOTAcumulator
+from evaluation.average_precision import mean_average_precision
+#from utils.detection import Detection
 
 
 class Detector(object):
@@ -41,18 +45,60 @@ class Detector(object):
             print(exc_type, exc_value, exc_traceback)
 
     def detect(self):
+        predictions_out=[]              # Predictions that will be output of the method
+                                        # for posterior analysis
+        i=0                             # frame counter
+
+        # Reading the groundtruth from given files
+        reader = AICityChallengeAnnotationReader(
+            path='../datasets/AICity_data/ai_challenge_s03_c010-full_annotation.xml')
+        gt_file = reader.get_annotations(classes=['car'])
+
+        y_true = []
+        y_pred = []
+        acc = MOTAcumulator()
+
         while self.vdo.grab():
             start = time.time()
             _, im = self.vdo.retrieve()
             # im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
             bbox_xcycwh, cls_conf, cls_ids = self.detectron2.detect(im)
 
+            '''
+            detection(frame=i,
+                      id=None,
+                      label='car',
+                      xtl=float(det[1][0]),
+                      ytl=float(det[1][1]),
+                      xbr=float(det[1][2]),
+                      ybr=float(det[1][3]),
+                      score=det[2])
+                      '''
+            # Once we have predicted what do we have in the frame
+            # load to the lists our GT
+            y_true.append(gt_file.get(i, []))           # Remember: i == frame counter
+            '''
+            y_pred.append(Detection(frame=i,
+                                    id=None,
+                                    label='car',
+                                    xtl=float(bbox_xcycwh[1][0]),
+                                    ytl=float(bbox_xcycwh[1][1]),
+                                    xbr=float(bbox_xcycwh[1][2]),
+                                    ybr=float(bbox_xcycwh[1][3]),
+                                    score=cls_conf))           # TODO: Maybe displacement between y_true (one per frame) & bbox. What happen if not same length? [Shifted]
+            '''
+            y_pred.append(bbox_xcycwh)
+            ypred2=[]
+            ypred2.append(Detection(i,None,'car',bbox_xcycwh[1][0],bbox_xcycwh[1][1],bbox_xcycwh[1][2],bbox_xcycwh[1][3],cls_conf))
+            acc.update(y_true[-1], ypred2[-1])
             if bbox_xcycwh is not None:
                 # select class CAR....
                 # in Detectron is classified by class 2. Note that other similar like :: truck can be of interest
                 mask = cls_ids == 2
                 try:
                     bbox_xcycwh = bbox_xcycwh[mask]
+                    # Before making it 20% bigger:
+                    predictions_out.append(bbox_xcycwh)     # Save the predicted bbox
                     bbox_xcycwh[:, 3:] *= 1.2
 
                     cls_conf = cls_conf[mask]
@@ -73,7 +119,14 @@ class Detector(object):
             if self.args.save_path:
                 self.output.write(im)
                 #cv2.imwrite(self.args.save_path, im)
-            # exit(0)
+
+            # before leaving the loop
+            i+=1
+        # exit(0)
+
+        ap, prec, rec = mean_average_precision(y_true, y_pred, classes=['car'])
+        summary = acc.compute()
+        print(f"AP: {ap:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, IDF1: {summary['idf1']['acc']:.4f}")
 
 
 def parse_args():

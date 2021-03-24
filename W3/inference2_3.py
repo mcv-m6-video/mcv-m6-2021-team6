@@ -60,6 +60,7 @@ import re
 import pickle
 import warnings
 from Reader import *
+from evaluation import intersection_over_union
 
 
 """
@@ -301,11 +302,20 @@ def saving_old_stuff():
     # compare_both(anottations_dataset, predictions)
 
 # POST: Given the annotations and predictions treated, it makes a comparisson.
-# TODO: for now it's just a signature method.
-def compare_both (annotations, predictions):
+# GT = id_frame; left; top; width; height
+def compare_both (gt, predictions):
+    print ("Hey")
+    print(gt)
+    print(predictions)
 
-    write_to_file(annotations, "anot_out.txt")
-    write_to_file(predictions, "pred_out.txt")
+# POST: Given a list of predictions, it's checking along them for each one and making mathematical relations to apply.
+def filter_predictions(predictions):
+    result = []
+    last_frame = 0
+    for pr in predictions:
+        # checking along all frames
+        while pr[0] == last_frame:
+            if
 
 
 # IN TYPE 1: We use the first output format
@@ -396,6 +406,8 @@ results = do_experiments_type1(cfg, predictor, images)      # We put inside to s
 reader = pickle.load(open('reader.pckl', 'rb'))
 gt = pickle.load(open('gt.pckl', 'rb'))
 predictions = pickle.load(open('predictions.pckl', 'rb'))
+
+compare_both(gt, predictions)
 
 
 t0 = time.time()
