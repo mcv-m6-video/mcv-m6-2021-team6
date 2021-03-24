@@ -118,7 +118,7 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='../datasets/frames
         print('Mask_RCNN AP: ', ap)
         print('IOU Mask_RCNN: ', iou_general)
         visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
-                      , speed=20, name=gif)
+                      , speed=20, name=gif, y_label='IOU Mask_RCNN', x_label='Frames')
         # plt.plot(frames, iou_per_frame)
         # fig1 = plt.gcf()
         # plt.ylabel('IoU Mask_RCNN')
@@ -130,22 +130,22 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='../datasets/frames
         print('SSD512 AP: ', ap)
         print('IOU SSD512: ', iou_general)
         visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
-                      , speed=20, name=gif)
+                      , speed=20, name=gif, y_label='IOU SSD512', x_label='Frames')
     elif neural_network == 4:
         gif = 'IOU_YOLO3.gif'
         print('YOLO3 AP: ', ap)
         print('IOU YOLO3: ', iou_general)
         visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
-                      , speed=20, name=gif)
+                      , speed=20, name=gif, y_label='IOU YOLO3', x_label='Frames')
     elif neural_network == 1:
         gif = 'IOU_FineTuned.gif'
         print('FineTuned AP: ', ap)
         print('IOU FineTuned: ', iou_general)
         visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
-                      , speed=20, name=gif)
+                      , speed=20, name=gif, y_label='IOU FineTuned', x_label='Frames')
 
 
-cv2.destroyAllWindows()
+#cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     # Neural Network : 1 = Mask_r_cnn FineTune,  2 = SSD, 3 = Mask_r_cnn, 4 = Yolo

@@ -2,9 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+
 def visualization(x_data, y_data, x_min_lim=0, y_min_lim=0, x_max_lim=1, y_max_lim=1, n_of_frames=100
-                      , speed=20, name='name.gif'):
+                  , speed=20, name='name.gif', y_label='y_label', x_label='x_label'):
     fig = plt.figure()
+    plt.ylabel(y_label)
+    plt.xlabel(x_label)
     ax = plt.axes(xlim=(x_min_lim, x_max_lim), ylim=(y_min_lim, y_max_lim))
     space, = ax.plot([], [])
 
@@ -55,7 +58,7 @@ def average_precision(gt_list, pred_list, confidence_score=True):
     if len(pred_list) == 0:
         return 0
 
-    if confidence_score :
+    if confidence_score:
         sorted_ind = np.argsort([-det[1].score for det in pred_list])
         pred_list_sorted = [pred_list[i] for i in sorted_ind]
         ap, prec, rec = voc_ap(gt_list, pred_list_sorted)
@@ -128,8 +131,7 @@ def voc_ap(gt_list, pred_list, ovthresh=0.5):
     # compute precision recall
     fp = np.cumsum(fp)
     tp = np.cumsum(tp)
-    rec = tp / (float(npos)+0.000000001)
-
+    rec = tp / (float(npos) + 0.000000001)
 
     # avoid divide by zero in case the first detection matches a difficult
     # ground truth
@@ -146,12 +148,13 @@ def voc_ap(gt_list, pred_list, ovthresh=0.5):
 
     return ap, prec, rec
 
+
 def iou_bbox(box1, box2):
     """
     Input format is [xtl, ytl, xbr, ybr] per bounding box, where
     tl and br indicate top-left and bottom-right corners of the bbox respectively
     """
-    #determine the (x, y)-coordinates of the intersection rectangle
+    # determine the (x, y)-coordinates of the intersection rectangle
     xA = max(box1[0], box2[0])
     yA = max(box1[1], box2[1])
     xB = min(box1[2], box2[2])
@@ -171,6 +174,7 @@ def iou_bbox(box1, box2):
     # return the intersection over union value
     return iou
 
+
 def compute_iou_over_time(gt_list, pred_list):
     """
     Compute the mean IOU over time (for each frame)
@@ -184,8 +188,10 @@ def compute_iou_over_time(gt_list, pred_list):
         for det in dets_gt:
             ious = []
             for det_p in dets_pred:
-                iou = iou_bbox(det.bbox,det_p.bbox)
+                iou = iou_bbox(det.bbox, det_p.bbox)
                 ious.append(iou)
+            if ious == []:
+                ious.append(0.0)
             box_ious.append(max(ious))
         frame_ious.append(np.mean(box_ious))
     mean_iou_global = np.mean(frame_ious)
@@ -222,6 +228,7 @@ def iou_vectorized(boxes1, boxes2):
     overlaps = inters / uni
 
     return overlaps
+
 
 def matched_bbox(prev_det, det):
     max_iou = 0
