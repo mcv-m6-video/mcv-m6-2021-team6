@@ -1,4 +1,20 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+def visualization(x_data, y_data, x_min_lim=0, y_min_lim=0, x_max_lim=1, y_max_lim=1, n_of_frames=100
+                      , speed=20, name='name.gif'):
+    fig = plt.figure()
+    ax = plt.axes(xlim=(x_min_lim, x_max_lim), ylim=(y_min_lim, y_max_lim))
+    space, = ax.plot([], [])
+
+    def animate(i):
+        space.set_data(x_data[:i], y_data[:i])
+        return space,
+
+    anim = FuncAnimation(fig, animate, frames=n_of_frames, interval=speed, blit=True)
+    anim.save(name, writer='imagemagick')
+
 
 def mean_average_precision(gt_list, pred_list, confidence_score=True, classes=["car"]):
     """

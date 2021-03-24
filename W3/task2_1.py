@@ -106,22 +106,43 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='../datasets/frames
 
         bb_frames.append(frame_det)
 
-    iou = compute_iou_over_time(gt_bb, bb_frames)
-
     ap, prec, rec = mean_average_precision(gt_bb, bb_frames)
+    iou_general, iou_per_frame = compute_iou_over_time(gt_bb, bb_frames)
 
-    if neural_network == 1:
-        print('Mask_FineTune AP: ', ap)
-        print('Mask_FineTune IoU: ', iou[0])
-    elif neural_network == 2:
-        print('SSD512 AP: ', ap)
-        print('SSD512 IoU: ', iou[0])
-    elif neural_network == 3:
+    frames = []
+    for i in range(0, len(iou_per_frame)):
+        frames.append(i)
+
+    if neural_network == 3:
+        gif = 'IOU_Mask_RCNN.gif'
         print('Mask_RCNN AP: ', ap)
-        print('Mask_RCNN IoU: ', iou[0])
+        print('IOU Mask_RCNN: ', iou_general)
+        visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
+                      , speed=20, name=gif)
+        # plt.plot(frames, iou_per_frame)
+        # fig1 = plt.gcf()
+        # plt.ylabel('IoU Mask_RCNN')
+        # plt.xlabel('Frames')
+        # plt.show()
+        # fig1.savefig('Mask_RCNN_IoU.png')
+    elif neural_network == 2:
+        gif = 'IOU_SSD512.gif'
+        print('SSD512 AP: ', ap)
+        print('IOU SSD512: ', iou_general)
+        visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
+                      , speed=20, name=gif)
     elif neural_network == 4:
+        gif = 'IOU_YOLO3.gif'
         print('YOLO3 AP: ', ap)
-        print('YOLO3 IoU: ', iou[0])
+        print('IOU YOLO3: ', iou_general)
+        visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
+                      , speed=20, name=gif)
+    elif neural_network == 1:
+        gif = 'IOU_FineTuned.gif'
+        print('FineTuned AP: ', ap)
+        print('IOU FineTuned: ', iou_general)
+        visualization(frames, iou_per_frame, x_max_lim=len(frames), y_max_lim=1, n_of_frames=len(frames)
+                      , speed=20, name=gif)
 
 
 cv2.destroyAllWindows()
