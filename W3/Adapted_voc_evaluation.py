@@ -6,13 +6,13 @@ from matplotlib.animation import FuncAnimation
 def visualization(x_data, y_data, x_min_lim=0, y_min_lim=0, x_max_lim=1, y_max_lim=1, n_of_frames=100
                   , speed=20, name='name.gif', y_label='y_label', x_label='x_label'):
     fig = plt.figure()
-    plt.ylabel(y_label)
-    plt.xlabel(x_label)
     ax = plt.axes(xlim=(x_min_lim, x_max_lim), ylim=(y_min_lim, y_max_lim))
     space, = ax.plot([], [])
 
     def animate(i):
         space.set_data(x_data[:i], y_data[:i])
+        ax.set_ylabel(y_label)
+        ax.set_xlabel(x_label)
         return space,
 
     anim = FuncAnimation(fig, animate, frames=n_of_frames, interval=speed, blit=True)
