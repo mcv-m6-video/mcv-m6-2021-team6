@@ -11,7 +11,7 @@ def task2_1():
     previous_frame = None
     acc_t = np.zeros(2)
     acc_list = []
-    for i in trange(0, int(video.num_frames/10)):
+    for i in trange(0, int(video.num_frames)):
         success, frame = video.capture.read()
         frame = cv2.resize(frame, (500, 250), interpolation=cv2.INTER_AREA)
         if not success:
