@@ -6,11 +6,12 @@ from tqdm import trange
 
 def task2_1():
     video = Video("videos/video_test.mp4", 500, 250)
-    revideo = video.get_result_video("stabilization")
+    out = cv2.VideoWriter(f'{video.resultsPath}/stabilization_result.mp4',
+                          cv2.VideoWriter_fourcc(*'XVID'), video.fps, (500, 250))
     previous_frame = None
     acc_t = np.zeros(2)
     acc_list = []
-    for i in trange(0, video.num_frames):
+    for i in trange(0, int(video.num_frames/10)):
         success, frame = video.capture.read()
         frame = cv2.resize(frame, (500, 250), interpolation=cv2.INTER_AREA)
         if not success:
@@ -29,13 +30,15 @@ def task2_1():
         previous_frame = frame
         acc_list.append(acc_t)
 
-        revideo.write(frame_stabilized)
+        out.write(frame_stabilized)
+    out.release()
 
 def task2_2(SMOOTHING_RADIUS = 50):
     video = Video("videos/video_test.mp4", 500, 250)
     # The larger the more stable the video, but less reactive to sudden panning
 
-
+    out = cv2.VideoWriter(f'{video.resultsPath}/pointmaching_result.mp4',
+                          cv2.VideoWriter_fourcc(*'XVID'), video.fps, (video.width, video.height))
     # Read input video
     cap = video.capture
 
@@ -46,9 +49,6 @@ def task2_2(SMOOTHING_RADIUS = 50):
     w = video.width
     h = video.height
 
-
-    # Set up output video
-    out = video.get_result_video("pointmaching")
 
     # Read first frame
     _, prev = cap.read()
@@ -150,8 +150,8 @@ def task2_2(SMOOTHING_RADIUS = 50):
         frame_out = cv2.hconcat([frame, frame_stabilized])
 
         # If the image is too big, resize it.
-        if (frame_out.shape[1] > 1920):
-            frame_out = cv2.resize(frame_out, (int(frame_out.shape[1] / 2), int(frame_out.shape[0] / 2)))
+        #if (frame_out.shape[1] > 1920):
+        #    frame_out = cv2.resize(frame_out, (int(frame_out.shape[1] / 2), int(frame_out.shape[0] / 2)))
 
         cv2.imshow("Before and After", frame_out)
         cv2.waitKey(10)
@@ -198,8 +198,6 @@ def block_matching(img_prev: np.ndarray, img_next: np.ndarray, block_size, searc
     elif motion_type == 'backward':
         reference = img_next
         target = img_prev
-    else:
-        raise ValueError(f'Unknown motion type: {motion_type}')
 
     assert (reference.shape == target.shape)
     height, width = reference.shape[:2]
@@ -246,4 +244,5 @@ def block_matching(img_prev: np.ndarray, img_next: np.ndarray, block_size, searc
 
 if __name__ == '__main__':
     #task2_1()
+
     task2_2()
