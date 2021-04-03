@@ -14,9 +14,10 @@ class Video:
         self.rewidth = rewidht
         self.reheight = reheight
 
-    def get_result_video(self):
-         return cv2.VideoWriter(f'{self.resultsPath}/resultStabilization.mp4',
-                              cv2.VideoWriter_fourcc(*'XVID'), self.fps, (self.rewidth, self.reheight))
+    def get_result_video(self, name):
+        # Stabilize video sequence
+        return cv2.VideoWriter(f'{self.resultsPath}/{name}_result.mp4',
+                              cv2.VideoWriter_fourcc(*'XVID'), self.fps, (self.width, self.height))
 
 if __name__ == '__main__':
     video = Video("videos/video_test.mp4")
