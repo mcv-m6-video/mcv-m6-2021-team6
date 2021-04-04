@@ -4,9 +4,9 @@ import numpy as np
 from tqdm import trange
 
 
-def task2_1():
-    video = Video("videos/video_test.mp4", 500, 250)
-    out = cv2.VideoWriter(f'{video.resultsPath}/stabilization_result.mp4',
+def task2_1(video_test = 'video', mode_stabilization = 'mean'):
+    video = Video(f"videos/{video_test}_test.mp4", 500, 250)
+    out = cv2.VideoWriter(f'{video.resultsPath}/stabilization_{video_test}_{mode_stabilization}_result.mp4',
                           cv2.VideoWriter_fourcc(*'XVID'), video.fps, (500, 250))
     previous_frame = None
     acc_t = np.zeros(2)
@@ -21,10 +21,14 @@ def task2_1():
             frame_stabilized = frame
         else:
             optical_flow = block_matching(previous_frame, frame, 32, 16,'forward', 'eucl')
-            average_optical_flow = - np.array(optical_flow.mean(axis=0).mean(axis=0), dtype=np.float32)
-            acc_t += average_optical_flow
-            H = np.float32([[1, 0, acc_t[0]], [0, 1, acc_t[1]]])
-            frame_stabilized = cv2.warpAffine(frame, H, (500, 250))
+
+            frame_stabilized = None
+            #We calculate the stabilization:
+            if(mode_stabilization == 'mean'):
+                average_optical_flow = - np.array(optical_flow.mean(axis=0).mean(axis=0), dtype=np.float32)
+                acc_t += average_optical_flow
+                H = np.float32([[1, 0, acc_t[0]], [0, 1, acc_t[1]]])
+                frame_stabilized = cv2.warpAffine(frame, H, (500, 250))
 
 
         previous_frame = frame
@@ -243,6 +247,20 @@ def block_matching(img_prev: np.ndarray, img_next: np.ndarray, block_size, searc
     return motion_field
 
 if __name__ == '__main__':
-    #task2_1()
+    """
+       For task 2_1 you can choose between the following parameters.
+       Video:
+            - easyvideo
+            - video
+            - film
+            - hard
+       Stabilization Mode:
+            - mean
+            - ...
+    """
+    task2_1('hard', 'mean')
 
-    task2_2()
+    """
+       For task 2_2 
+    """
+    #task2_2()
