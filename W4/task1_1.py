@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from OpticalFlow import read_flow, msen_pepn
 from display import plt_flow_error, histogram_with_mean_plot, draw_flow, get_plot_legend, colorflow_black, visualize_3d_plot
+import time
 
 def distance(x1: np.ndarray, x2: np.ndarray, metric='euclidean'):
     if metric == 'euclidean':
@@ -34,9 +35,9 @@ def task1(img1, img2, block_size = 8, search_area = 8, motion_type='forward', me
     # predicted frame.
     #pred_img = np.empty((h, w, 3), dtype=np.uint8)
     motion_field = np.zeros((h, w, 2), dtype=float)
-    for row in range(0, h - block_size, block_size):
+    for row in range(0, h - block_size, int(block_size)):
 
-        for col in range(0, w - block_size, block_size):
+        for col in range(0, w - block_size, int(block_size)):
             # block matching
             block = ref[row:row + block_size, col:col + block_size]
             # minimum distance
@@ -68,8 +69,10 @@ def task1(img1, img2, block_size = 8, search_area = 8, motion_type='forward', me
             u = c - (col - colb)
 
             motion_field[row:row + block_size, col:col+block_size, :] = [u, v]
-
-    return motion_field
+    if motion_type == 'forward':
+        return motion_field
+    elif motion_type == 'backward':
+        return motion_field * -1
 
 if __name__ == '__main__':
     display = False
@@ -79,8 +82,8 @@ if __name__ == '__main__':
     img1 = cv2.imread(file_img1, 0)
     img2 = cv2.imread(file_img2, 0)
     flow_gt = read_flow(f'{path_img}000045_10_noc.png')
-    block_size = [8,12,16, 20, 24, 28, 32, 36, 40]
-    search_area = [12, 18, 24, 30, 36, 42, 48, 54, 60]
+    block_size = [36]
+    search_area = [30]
     msens = np.zeros((len(search_area), len(block_size)))
     psens = np.zeros((len(search_area), len(block_size)))
     X, Y = np.meshgrid(search_area, block_size)
@@ -88,12 +91,14 @@ if __name__ == '__main__':
     for x in block_size:
         i = 0
         for y in search_area:
-            motion_field = task1(img1, img2, block_size = x, search_area = y, motion_type='forward', metric='euclidean')
+            s = time.time()
+            motion_field = task1(img1, img2, block_size = x, search_area = y, motion_type='backward', metric='euclidean')
+            e = time.time()
             error_flow, non_occ_err_flow, msen, pepn = msen_pepn(motion_field, flow_gt, th=5)
             msens[j, i] = msen
             psens[j, i] = pepn
             i += 1
-            print('MSEN: ', msen, 'PEPN: ', pepn,'Block size: ',x, 'Search windows: ', y)
+            print('MSEN: ', msen, 'PEPN: ', pepn,'Block size: ',x, 'Search windows: ', y, 'runtime: ', e-s)
             if display == True:
                 file_img1 = f'{path_img}000045_10.png'
                 img1 = cv2.imread(file_img1, 0)
