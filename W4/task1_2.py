@@ -8,8 +8,9 @@ from display import draw_flow, get_plot_legend, colorflow_black
 import numpy as np
 import time
 from HornSchunck import HornSchunck
-
+import pyflow
 def task1_2(img1, img2, method='pyflow', block_size = None):
+
 
     if method == 'pyflow':
         # Flow Options:
@@ -20,9 +21,10 @@ def task1_2(img1, img2, method='pyflow', block_size = None):
         nInnerFPIterations = 1
         nSORIterations = 30
         colType = 1  # 0 or default:RGB, 1:GRAY (but pass gray image with shape (h,w,1))
-
+        im1 = np.atleast_3d(img1.astype(float) / 255.)
+        im2 = np.atleast_3d(img2.astype(float) / 255.)
         s = time.time()
-        u, v, im2W = coarse2fine_flow( img1, img2, alpha, ratio, minWidth, nOuterFPIterations, nInnerFPIterations, nSORIterations, colType)
+        u, v, im2W = pyflow.coarse2fine_flow(im1, im2, alpha, ratio, minWidth, nOuterFPIterations, nInnerFPIterations, nSORIterations, colType)
         e = time.time()
 
         motion_field = np.dstack((u, v))
@@ -55,15 +57,16 @@ def task1_2(img1, img2, method='pyflow', block_size = None):
     return motion_field, e, s
 
 if __name__ == '__main__':
-    path_img = "datasets/Kitti/"
+    path_img = "../datasets/Kitti/"
     flow_gt = read_flow(f'{path_img}000045_10_gt.png')
     file_img1 = f'{path_img}000045_10.png'
     file_img2 = f'{path_img}000045_11.png'
-    img1 = cv2.imread(file_img1, 0)
-    img2 = cv2.imread(file_img2, 0)
+
+    img1 = cv2.imread(file_img1, cv2.IMREAD_GRAYSCALE)
+    img2 = cv2.imread(file_img2, cv2.IMREAD_GRAYSCALE)
     block_size = [32]
     for blk in block_size:
-        motion_field, e, s = task1_2(img1, img2, method= 'horn', block_size = None)
+        motion_field, e, s = task1_2(img1, img2, block_size = None)
         error_flow, non_occ_err_flow, msen, pepn = msen_pepn(motion_field, flow_gt, th=5)
         print(f'MSEN: {msen:.4f}, PEPN: {pepn:.4f}, runtime: {e - s:.3f}s, BS:{blk}')
 
@@ -71,3 +74,4 @@ if __name__ == '__main__':
     color_flow_legend = colorflow_black(flow_legend)
     cv2.imshow("color wheel", color_flow_legend)
     cv2.imshow('flow predicted', colorflow_black(motion_field))
+    cv2.waitKey()
