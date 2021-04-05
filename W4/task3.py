@@ -7,83 +7,75 @@ import itertools
 path_to_frames = '../datasets/frames/'
 path_to_video = '../datasets/AICity_data/train/S03/c010/vdo.avi'
 
-lk_params = dict( winSize  = (10, 10),
-                  maxLevel = 5,
-                  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
-
-feature_params = dict( maxCorners = 3000,
-                       qualityLevel = 0.5,
-                       minDistance = 3,
-                       blockSize = 3)
-
-# 1st Source tested.
-# It was not working by default,
-# and maybe needs to be readed the code form the 24min video
-# https://pysource.com/2018/05/14/optical-flow-with-lucas-kanade-method-opencv-3-4-with-python-3-tutorial-31/
-
-# SOURCE: https://gist.github.com/jayrambhia/3295631
-def lk():
-    cam = cv2.VideoCapture(0)
-    _, img = cam.read()
-    oldg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    bb = [200, 200, 300, 300]
-    old_pts = []
-    while True:
-        try:
-            _, img = cam.read()
-            img1 = img[bb[0]:bb[2], bb[1]:bb[3]]
-            # print img1.shape
-            g = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-            # print g.shape
-            pt = cv2.goodFeaturesToTrack(g, **feature_params)
-            #for i in range(len(pt)):
-            #    pt[i][0][0] = pt[i][0][0] + bb[0]
-            #    pt[i][0][1] = pt[i][0][1] + bb[1]
-            newg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            p0 = np.float32(pt).reshape(-1, 1, 2)
-            p1, st, err = cv2.calcOpticalFlowPyrLK(oldg, newg, p0, None, **lk_params)
-            p0r, st, err = cv2.calcOpticalFlowPyrLK(newg, oldg, p1, None, **lk_params)
-            d = abs(p0 - p0r).reshape(-1, 2).max(-1)
-            good = d < 1
-            new_pts = []
-            for pts, val in zip(p1, good):
-                if val:
-                    new_pts.append([pts[0][0], pts[0][1]])
-                    cv2.circle(img, (pts[0][0], pts[0][1]), 5, thickness=3, color=(255, 255, 0))
-            bb = predictBB(bb, old_pts, new_pts)
-            if bb[0] + bb[2] >= img.shape[0]:
-                bb[0] = img.shape[0] - bb[2] - 1
-            if bb[1] + bb[3] >= img.shape[1]:
-                bb[1] = img.shape[1] - bb[3] - 1
-            old_pts = new_pts
-            oldg = newg
-            cv2.rectangle(img, (bb[0], bb[1]), (bb[0] + bb[2], bb[1] + bb[3]), color=(255, 0, 0))
-            cv2.imshow("LK", img)
-            cv2.waitKey(1)
-        except KeyboardInterrupt:
+#Source: https://docs.opencv.org/3.3.1/d7/d8b/tutorial_py_lucas_kanade.html
+def openCVtutorial1():
+    cap = cv2.VideoCapture(path_to_video)
+    # params for ShiTomasi corner detection
+    feature_params = dict(maxCorners=100,
+                          qualityLevel=0.3,
+                          minDistance=7,
+                          blockSize=7)
+    # Parameters for lucas kanade optical flow
+    lk_params = dict(winSize=(15, 15),
+                     maxLevel=2,
+                     criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+    # Create some random colors
+    color = np.random.randint(0, 255, (100, 3))
+    # Take first frame and find corners in it
+    ret, old_frame = cap.read()
+    old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
+    p0 = cv2.goodFeaturesToTrack(old_gray, mask=None, **feature_params)
+    # Create a mask image for drawing purposes
+    mask = np.zeros_like(old_frame)
+    while (1):
+        ret, frame = cap.read()
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # calculate optical flow
+        p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
+        # Select good points
+        good_new = p1[st == 1]
+        good_old = p0[st == 1]
+        # draw the tracks
+        for i, (new, old) in enumerate(zip(good_new, good_old)):
+            a, b = new.ravel()
+            c, d = old.ravel()
+            mask = cv2.line(mask, (a, b), (c, d), color[i].tolist(), 2)
+            frame = cv2.circle(frame, (a, b), 5, color[i].tolist(), -1)
+        img = cv2.add(frame, mask)
+        cv2.imshow('frame', img)
+        k = cv2.waitKey(30) & 0xff
+        if k == 27:
             break
+        # Now update the previous frame and previous points
+        old_gray = frame_gray.copy()
+        p0 = good_new.reshape(-1, 1, 2)
+    cv2.destroyAllWindows()
+    cap.release()
 
-
-def predictBB(bb0, pt0, pt1):
-    if not pt0:
-        pt0 = pt1
-    dx = []
-    dy = []
-    for p1, p2 in zip(pt0, pt1):
-        dx.append(p2[0] - p1[0])
-        dy.append(p2[1] - p1[1])
-    if not dx or not dy:
-        return bb0
-    cen_dx = round(sum(dx) / len(dx))
-    cen_dy = round(sum(dy) / len(dy))
-    print(cen_dx, cen_dy)
-    print ("shift")
-    bb = [int(bb0[0] + cen_dx), int(bb0[1] + cen_dy), int(bb0[2]), int(bb0[3])]
-    if bb[0] <= 0:
-        bb[0] = 1
-    if bb[1] <= 0:
-        bb[1] = 1
-    return bb
+def openCVtutorial2():
+    cap = cv2.VideoCapture(path_to_video)
+    ret, frame1 = cap.read()
+    prvs = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+    hsv = np.zeros_like(frame1)
+    hsv[..., 1] = 255
+    while (1):
+        ret, frame2 = cap.read()
+        next = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+        flow = cv2.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+        mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
+        hsv[..., 0] = ang * 180 / np.pi / 2
+        hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+        bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+        cv2.imshow('frame2', bgr)
+        k = cv2.waitKey(30) & 0xff
+        if k == 27:
+            break
+        elif k == ord('s'):
+            cv2.imwrite('opticalfb.png', frame2)
+            cv2.imwrite('opticalhsv.png', bgr)
+        prvs = next
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 def task3(path_to_video, save_frames=False, path_to_frames='../datasets/frames/'):
@@ -111,4 +103,5 @@ if __name__ == '__main__':
     display = False
     #task3(path_to_video, save_frames=False,
     #            path_to_frames=path_to_frames)
-    lk()
+    #openCVtutorial1()
+    openCVtutorial2()
