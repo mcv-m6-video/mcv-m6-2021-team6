@@ -9,8 +9,8 @@ def task2_1(video_test = 'video', mode_stabilization = 'mean'):
     out = cv2.VideoWriter(f'{video.resultsPath}/stabilization_{video_test}_{mode_stabilization}_result.mp4',
                           cv2.VideoWriter_fourcc(*'XVID'), video.fps, (500, 250))
     previous_frame = None
-    acc_t = np.zeros(2)
-    acc_list = []
+    acc = np.zeros(2)
+    #acc_list = []
     for i in trange(0, int(video.num_frames)):
         success, frame = video.capture.read()
         frame = cv2.resize(frame, (500, 250), interpolation=cv2.INTER_AREA)
@@ -23,16 +23,25 @@ def task2_1(video_test = 'video', mode_stabilization = 'mean'):
             optical_flow = block_matching(previous_frame, frame, 32, 16,'forward', 'eucl')
 
             frame_stabilized = None
+            average_optical_flow = None
+
             #We calculate the stabilization:
             if(mode_stabilization == 'mean'):
-                average_optical_flow = - np.array(optical_flow.mean(axis=0).mean(axis=0), dtype=np.float32)
-                acc_t += average_optical_flow
-                H = np.float32([[1, 0, acc_t[0]], [0, 1, acc_t[1]]])
-                frame_stabilized = cv2.warpAffine(frame, H, (500, 250))
+                x = optical_flow[:, :, 0].mean()
+                y = optical_flow[:, :, 1].mean()
+                average_optical_flow=-np.array([x, y])
+                #average_optical_flow = - np.array(optical_flow.mean(axis=0).mean(axis=0), dtype=np.float32)
+            if (mode_stabilization == 'median'):
+                x, y = np.median(optical_flow[:, :, 0]), np.median(optical_flow[:, :, 1])
+                average_optical_flow=np.array([x, y])
+
+            acc += average_optical_flow
+            matrix = np.float32([[1, 0, acc[0]], [0, 1, acc[1]]])
+            frame_stabilized = cv2.warpAffine(frame, matrix, (500, 250))
 
 
         previous_frame = frame
-        acc_list.append(acc_t)
+        #acc_list.append(acc)
 
         out.write(frame_stabilized)
     out.release()
@@ -173,7 +182,6 @@ def fixBorder(frame):
   T = cv2.getRotationMatrix2D((s[1]/2, s[0]/2), 0, 1.04)
   frame = cv2.warpAffine(frame, T, (s[1], s[0]))
   return frame
-
 def movingAverage(curve, radius):
     window_size = 2 * radius + 1
     # Define the filter
@@ -193,7 +201,6 @@ def smooth(trajectory):
         smoothed_trajectory[:,i] = movingAverage(trajectory[:,i], radius=100)
 
     return smoothed_trajectory
-
 def block_matching(img_prev: np.ndarray, img_next: np.ndarray, block_size, search_area, motion_type, metric):
 
     if motion_type == 'forward':
@@ -258,7 +265,7 @@ if __name__ == '__main__':
             - mean
             - ...
     """
-    task2_1('hard', 'mean')
+    task2_1('video', 'median')
 
     """
        For task 2_2 
