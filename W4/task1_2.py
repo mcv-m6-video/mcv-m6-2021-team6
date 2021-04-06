@@ -9,9 +9,9 @@ import numpy as np
 import time
 from HornSchunck import HornSchunck
 import pyflow
-def task1_2(img1, img2, method='pyflow', block_size = None):
 
 
+def task1_2(img1, img2, method='pyflow', block_size=None):
     if method == 'pyflow':
         # Flow Options:
         alpha = 0.012
@@ -24,7 +24,8 @@ def task1_2(img1, img2, method='pyflow', block_size = None):
         im1 = np.atleast_3d(img1.astype(float) / 255.)
         im2 = np.atleast_3d(img2.astype(float) / 255.)
         s = time.time()
-        u, v, im2W = pyflow.coarse2fine_flow(im1, im2, alpha, ratio, minWidth, nOuterFPIterations, nInnerFPIterations, nSORIterations, colType)
+        u, v, im2W = pyflow.coarse2fine_flow(im1, im2, alpha, ratio, minWidth, nOuterFPIterations, nInnerFPIterations,
+                                             nSORIterations, colType)
         e = time.time()
 
         motion_field = np.dstack((u, v))
@@ -47,7 +48,7 @@ def task1_2(img1, img2, method='pyflow', block_size = None):
         s = time.time()
         motion_field = cv2.calcOpticalFlowFarneback(img1, img2, None, 0.5, 3, block_size, 3, 5, 1.2, 0)
         e = time.time()
-        
+
     elif method == 'horn':
         s = time.time()
         U, V = HornSchunck(img1, img2, alpha=5.0, Niter=100)
@@ -55,6 +56,7 @@ def task1_2(img1, img2, method='pyflow', block_size = None):
         e = time.time()
 
     return motion_field, e, s
+
 
 if __name__ == '__main__':
     path_img = "../datasets/Kitti/"
@@ -66,7 +68,7 @@ if __name__ == '__main__':
     img2 = cv2.imread(file_img2, cv2.IMREAD_GRAYSCALE)
     block_size = [32]
     for blk in block_size:
-        motion_field, e, s = task1_2(img1, img2, block_size = None)
+        motion_field, e, s = task1_2(img1, img2, block_size=None)
         error_flow, non_occ_err_flow, msen, pepn = msen_pepn(motion_field, flow_gt, th=5)
         print(f'MSEN: {msen:.4f}, PEPN: {pepn:.4f}, runtime: {e - s:.3f}s, BS:{blk}')
 

@@ -96,11 +96,12 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='../datasets/frames
             frame_det.append(det)
             if True:
                 cv2.rectangle(img, (int(det.xtl), int(det.ytl)), (int(det.xbr), int(det.ybr)), track.color, 2)
-                cv2.putText(img, str(track.id), org=(int(det.xtl),int(det.ytl)), fontFace = cv2.FONT_HERSHEY_SIMPLEX, fontScale = 1, color = track.color, thickness = 2)
+                cv2.putText(img, str(track.id), org=(int(det.xtl), int(det.ytl)), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                            fontScale=1, color=track.color, thickness=2)
                 for c in track.detections:
                     cv2.circle(img, c.center, 5, track.color, -1)
         if False:
-            cv2.imshow('tracking detections', cv2.resize(img, (900, 600)))
+            cv2.imshow('Tracking detections', cv2.resize(img, (900, 600)))
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
 
@@ -108,7 +109,8 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='../datasets/frames
 
     ap, prec, rec = mean_average_precision(gt_bb, bb_frames)
     iou_general, iou_per_frame = compute_iou_over_time(gt_bb, bb_frames)
-
+    idf1 = idf1_score(gt_bb, bb_frames)
+    print('IDF1 = ', idf1)
     frames = []
     for i in range(0, len(iou_per_frame)):
         frames.append(i)
@@ -145,10 +147,10 @@ def task2_1(path_to_video, save_frames=False, path_to_frames='../datasets/frames
                       , speed=20, name=gif, y_label='IOU FineTuned', x_label='Frames')
 
 
-#cv2.destroyAllWindows()
+# cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     # Neural Network : 1 = Mask_r_cnn FineTune,  2 = SSD, 3 = Mask_r_cnn, 4 = Yolo
-    for n in range(1, 5):
-        task2_1(path_to_video, save_frames=False,
-                path_to_frames=path_to_frames, neural_network=n)
+    # for n in range(1, 5):
+    task2_1(path_to_video, save_frames=False,
+            path_to_frames=path_to_frames, neural_network=4)

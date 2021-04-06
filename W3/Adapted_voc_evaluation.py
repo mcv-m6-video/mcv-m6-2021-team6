@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import motmetrics as mm
 
 
 def visualization(x_data, y_data, x_min_lim=0, y_min_lim=0, x_max_lim=1, y_max_lim=1, n_of_frames=100
@@ -242,3 +243,55 @@ def matched_bbox(prev_det, det):
         return best_match
     else:
         return None
+
+
+def idf1_score(list_gt_bboxes, tracked_detections):
+    """The lists passed are of the form [label, tly, tlx, width, height, confidence, id]"""
+
+    for frames in list_gt_bboxes:
+        for element in frames:
+            frame = getattr(element, 'frame')
+            xtl = int(float(getattr(element, 'xtl')))
+            ytl = int(float(getattr(element, 'ytl')))
+            xbr = int(float(getattr(element, 'xbr')))
+            ybr = int(float(getattr(element, 'ybr')))
+            height = ybr - ytl
+            width = xbr - xtl
+            id_det = int(getattr(element, 'id'))
+            if getattr(element, 'score') is None:
+                confidence = np.random
+            else: confidence = getattr(element, 'score')
+            '''if frame == getattr(element, 'frame'):
+                element.append(['car', xtl, ytl, height, width, random(), id_det])
+            else:'''
+            element[frame] = ['car', xtl, ytl, height, width, confidence, id_det]
+
+    acc = mm.MOTAccumulator(auto_id=True)
+    for gt_elements_frame, det_elements_frame in zip(bboxes, tracked_detections):
+        det_ids = []
+        gt_ids = []
+        mm_det_bboxes = []
+        mm_gt_bboxes = []
+
+        for gt_bbox in gt_elements_frame:
+            # mm_gt_bboxes.append([(gt_bbox[1]+gt_bbox[3])/2, (gt_bbox[2]+gt_bbox[4])/2, gt_bbox[3]-gt_bbox[1],
+            #                      gt_bbox[4]-gt_bbox[2]])
+            mm_gt_bboxes.append([gt_bbox[2], gt_bbox[1], gt_bbox[3], gt_bbox[4]])
+
+            gt_ids.append(gt_bbox[-1])
+
+        for det_bbox in det_elements_frame:
+            # mm_det_bboxes.append([(det_bbox[1]+det_bbox[3])/2, (det_bbox[2]+det_bbox[4])/2, det_bbox[3]-det_bbox[1],
+            #                      det_bbox[4]-det_bbox[2]])
+            mm_det_bboxes.append([det_bbox[2], det_bbox[1], det_bbox[3], det_bbox[4]])
+
+            det_ids.append(det_bbox[-1])
+
+        distances_gt_det = mm.distances.iou_matrix(mm_gt_bboxes, mm_det_bboxes, max_iou=1.)
+        acc.update(gt_ids, det_ids, distances_gt_det)
+
+    mh = mm.metrics.create()
+    summary = mh.compute(acc, metrics=['idf1'], name='acc')
+
+    print(summary)
+    return summary
