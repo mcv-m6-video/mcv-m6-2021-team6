@@ -7,10 +7,10 @@
 </ul>
 
 
-## Tasks W4 (from slides):
+## Tasks W5 (from slides):
 
-- [X] T1.1 - Optical flow with Block Matching
-- [X] T1.2 - Off-the-shelf Optical Flow
-- [X] T2.1 - Video Stabilization with Block Matching
-- [X] T2.2 - Off-the-shelf stabilization
-- [X] T3.1 - Object Tracking with Optical Flow
+- [ ] T1 - Multi-target single-camera (MTSC) tracking
+- [ ] T2 - Multi-target multi-camera (MTMC) tracking
+- [ ] T3 - Final deliverables
+- [ ] T3.1 - Writing skills
+- [ ] T3.2 - Software on github repo
