@@ -1,3 +1,6 @@
+# This class Detectron2 is pure sugar
+# an encapsulation of the main detectron2 methods
+
 from detectron2.utils.logger import setup_logger
 
 setup_logger()

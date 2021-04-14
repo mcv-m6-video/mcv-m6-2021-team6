@@ -1,12 +1,8 @@
 import numpy as np
 
-from evaluation.intersection_over_union import vec_intersecion_over_union
-
-
-def mean_average_precision(y_true, y_pred, classes=None):
+def mean_average_precision(y_true, y_pred, classes=None, sort_method=None, is_cpu = True):
     """
     Mean Average Precision across classes.
-
     Args:
         y_true: [[Detection,...],...]
         y_pred: [[Detection,...],...]
@@ -16,24 +12,30 @@ def mean_average_precision(y_true, y_pred, classes=None):
     if classes is None:
         classes = np.unique([det.label for boxlist in y_true for det in boxlist])
 
+    precs = []
+    recs = []
     aps = []
     for cls in classes:
         # filter by class
         y_true_cls = [[det for det in boxlist if det.label == cls] for boxlist in y_true]
-        y_pred_cls = [[det for det in boxlist if det.label == cls] for boxlist in y_pred]
-        ap, prec, rec = average_precision(y_true_cls, y_pred_cls)
+        if is_cpu:
+            y_pred_cls = [[det for det in boxlist if det.label == cls.cpu()] for boxlist in y_pred]
+        else:
+            y_pred_cls = [[det for det in boxlist if det.label == cls] for boxlist in y_pred]
+        ap, prec, rec = average_precision(y_true_cls, y_pred_cls, sort_method)
+        precs.append(prec)
+        recs.append(rec)
         aps.append(ap)
+    prec = np.mean(precs) if aps else 0
+    rec = np.mean(recs) if aps else 0
     map = np.mean(aps) if aps else 0
-    prec = np.mean(prec) if aps else 0
-    rec = np.mean(rec) if aps else 0
 
     return map, prec, rec
 
 
-def average_precision(y_true, y_pred):
+def average_precision(y_true, y_pred, sort_method=None):
     """
     Average Precision with or without confidence scores.
-
     Args:
         y_true: [[Detection,...],...]
         y_pred: [[Detection,...],...]
@@ -42,23 +44,32 @@ def average_precision(y_true, y_pred):
     y_pred = [(i, det) for i in range(len(y_pred)) for det in y_pred[i]]  # flatten
     if len(y_pred) == 0:
         return 0
-    else:
-        with_scores = y_pred[0][1].score is not None
 
-    if with_scores:
+    if sort_method == 'score':
         # sort by confidence
         sorted_ind = np.argsort([-det[1].score for det in y_pred])
+        y_pred_sorted = [y_pred[i] for i in sorted_ind]
+        ap, prec, rec = voc_ap(y_true, y_pred_sorted)
+    elif sort_method == 'area':
+        # sort by area
+        sorted_ind = np.argsort([-det[1].area for det in y_pred])
         y_pred_sorted = [y_pred[i] for i in sorted_ind]
         ap, prec, rec = voc_ap(y_true, y_pred_sorted)
     else:
         # average metrics across n random orderings
         n = 10
+        precs = []
+        recs = []
         aps = []
         for _ in range(n):
             shuffled_ind = np.random.permutation(len(y_pred))
             y_pred_shuffled = [y_pred[i] for i in shuffled_ind]
             ap, prec, rec = voc_ap(y_true, y_pred_shuffled)
+            precs.append(prec)
+            recs.append(rec)
             aps.append(ap)
+        prec = np.mean(precs)
+        rec = np.mean(recs)
         ap = np.mean(aps)
     return ap, prec, rec
 
@@ -68,8 +79,7 @@ def average_precision(y_true, y_pred):
 
 def voc_ap(y_true, y_pred, ovthresh=0.5):
     """
-    Average Precision as defined by PASCAL VOC (11-point method).
-
+    Average Precision as defined by PASCAL VOC (11-point tracking).
     Args:
         y_true: [[Detection,...],...]
         y_pred: [Detection,...]
@@ -130,3 +140,42 @@ def voc_ap(y_true, y_pred, ovthresh=0.5):
         ap = ap + p / 11.0
 
     return ap, prec, rec
+
+def vec_intersecion_over_union(boxes1, boxes2):
+    """
+    Compute overlaps between two sets of boxes.
+    Args:
+        boxes1: [[xtl,ytl,xbr,ybr],...]
+        boxes2: [[xtl,ytl,xbr,ybr],...]
+    Returns:
+        overlaps: matrix of pairwise overlaps.
+    """
+
+    x11, y11, x12, y12 = np.split(boxes1, 4, axis=1)
+    x21, y21, x22, y22 = np.split(boxes2, 4, axis=1)
+
+    # intersection
+    ixmin = np.maximum(x11, np.transpose(x21))
+    iymin = np.maximum(y11, np.transpose(y21))
+    ixmax = np.minimum(x12, np.transpose(x22))
+    iymax = np.minimum(y12, np.transpose(y22))
+    iw = np.maximum(ixmax - ixmin + 1.0, 0.0)
+    ih = np.maximum(iymax - iymin + 1.0, 0.0)
+    inters = iw * ih
+
+    # union
+    area1 = (x12 - x11 + 1.0) * (y12 - y11 + 1.0)
+    area2 = (x22 - x21 + 1.0) * (y22 - y21 + 1.0)
+    uni = area1 + np.transpose(area2) - inters
+
+    overlaps = inters / uni
+
+    return overlaps
+
+
+def mean_intersection_over_union(boxes1, boxes2):
+    boxes1 = np.array(boxes1).reshape(-1, 4)
+    boxes2 = np.array(boxes2).reshape(-1, 4)
+    overlaps = vec_intersecion_over_union(boxes1, boxes2)
+    # for each gt (rows) select the max overlap with any detection (columns)
+    return np.mean(np.max(overlaps, axis=1))
