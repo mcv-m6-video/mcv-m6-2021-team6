@@ -14,6 +14,8 @@ class Detector(object):
     def __init__(self, args):
         self.args = args
         use_cuda = bool(strtobool(self.args.use_cuda))
+
+        # Display arg management
         if args.display:
             cv2.namedWindow("test", cv2.WINDOW_NORMAL)
             cv2.resizeWindow("test", args.display_width, args.display_height)
@@ -24,8 +26,10 @@ class Detector(object):
         self.deepsort = DeepSort(args.deepsort_checkpoint, use_cuda=use_cuda)
 
     def __enter__(self):
-        assert os.path.isfile(self.args.VIDEO_PATH), "Error: path error"
-        self.vdo.open(self.args.VIDEO_PATH)
+        # check if in the given parameter there's a file.
+        assert os.path.isfile(self.args.vid_path), "Error: vid_path error. The given path is not a file"
+        self.vdo.open(self.args.vid_path)
+        # obtain width & height of video
         self.im_width = int(self.vdo.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.im_height = int(self.vdo.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
@@ -34,6 +38,15 @@ class Detector(object):
             self.output = cv2.VideoWriter(self.args.save_path, fourcc, 20, (self.im_width, self.im_height))
 
         assert self.vdo.isOpened()
+
+        # ROI addition
+        if self.args.roi_path:
+            assert os.path.isfile(self.args.roi_path), "Error: roi_path error. The given path is not a file"
+            self.roi = cv2.imread(self.args.roi_path, cv2.IMREAD_GRAYSCALE)
+            if self.args.display:
+                cv2.imshow("ROI", self.roi)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
@@ -78,7 +91,8 @@ class Detector(object):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("VIDEO_PATH", type=str)
+    parser.add_argument("--vid_path", type=str)
+    parser.add_argument("--roi_path", type=str)
     parser.add_argument("--deepsort_checkpoint", type=str, default="deep_sort/deep/checkpoint/ckpt.t7")
     parser.add_argument("--max_dist", type=float, default=0.3)
     parser.add_argument("--ignore_display", dest="display", action="store_false")
