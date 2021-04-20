@@ -16,6 +16,6 @@
 - [ ] T3.2 - Software on github repo
 
 
-[Slides]()
+[Presentation](https://docs.google.com/presentation/d/1aU-1_J8-TkcwG78auCCrVxdEHGYVX8jjovoIKQD9pC4/edit?usp=sharing)
 
 [Report]()
