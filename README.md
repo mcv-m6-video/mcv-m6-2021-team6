@@ -14,3 +14,8 @@
 - [ ] T3 - Final deliverables
 - [ ] T3.1 - Writing skills
 - [ ] T3.2 - Software on github repo
+
+
+[Slides]()
+
+[Report]()
