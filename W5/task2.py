@@ -41,13 +41,7 @@ class MOTAcumulator:
 
 def matches(imageA, imageB, bboxA, bboxB):
 
-    imageA = imageA[(int(bboxA.bbox[1]-20)):(int(bboxA.bbox[3]+20)), (int(bboxA.bbox[0]-20)):(int(bboxA.bbox[2]+20))]
-    imageB = imageB[(int(bboxB.bbox[1]-20)):(int(bboxB.bbox[3]+20)), (int(bboxB.bbox[0]-20)):(int(bboxB.bbox[2]+20))]
-    imageA = cv2.resize(imageA, (100, 100))
-    #imageA = cv2.cvtColor(imageA, cv2.COLOR_BGR2YCrCb)
-    imageB = cv2.resize(imageB, (100, 100))
-    #imageB = cv2.cvtColor(imageB, cv2.COLOR_BGR2YCrCb)
-
+    '''
     try:
         cv2.imshow('tracking detections 1', cv2.resize(imageA, (900, 600)))
         cv2.imshow('tracking detections 2', cv2.resize(imageB, (900, 600)))
@@ -64,6 +58,20 @@ def matches(imageA, imageB, bboxA, bboxB):
         good = 0
     '''
     try:
+
+        imageA = imageA[(int(bboxA.bbox[1])):(int(bboxA.bbox[3])),
+                 (int(bboxA.bbox[0])):(int(bboxA.bbox[2]))]
+        imageB = imageB[(int(bboxB.bbox[1])):(int(bboxB.bbox[3])),
+                 (int(bboxB.bbox[0])):(int(bboxB.bbox[2]))]
+        imageA = cv2.resize(imageA, (100, 100))
+        # imageA = cv2.cvtColor(imageA, cv2.COLOR_BGR2YCrCb)
+        imageB = cv2.resize(imageB, (100, 100))
+        # imageB = cv2.cvtColor(imageB, cv2.COLOR_BGR2YCrCb)
+
+        cv2.imshow('tracking detections 1', cv2.resize(imageA, (900, 600)))
+        cv2.imshow('tracking detections 2', cv2.resize(imageB, (900, 600)))
+        cv2.waitKey(0)
+
         # Initiate SIFT detector
         sift = cv2.SIFT_create()
         # find the keypoints and descriptors with SIFT
@@ -80,7 +88,7 @@ def matches(imageA, imageB, bboxA, bboxB):
                 good.append([m])
     except:
         good = []
-    '''
+
     return good
 
 
@@ -127,7 +135,7 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
 
     bb_frames1, bb_frames2 = [], []
     tracks1, tracks2 = [], []
-    max_track1, max_track2 = 0, 0
+    max_track = 0
     moc_gt1, moc_gt2 = [], []
     moc_pred1, moc_pred2 = [], []
     # Create an accumulator that will be updated during each frame
@@ -164,15 +172,18 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                         for i, t in enumerate(track1_tot):
                             if t[0] == track.id:
                                 track1_tot[i] = [t[0], matched_det1, img1]
-                        max_good = 0
+                        max_good = []
                         for t in track2_tot:
                             good = matches(img1, t[2], matched_det1, t[1])
-                            print(good)
-                            if good > max_good:
+                            print(len(good))
+                            if len(good) > len(max_good):
                                 max_good = good
                                 save_t = t
-                        if max_good > 0.30:
+                        if len(max_good) > 4:
                             track.id = save_t[0]
+                            for i, t in enumerate(track2_tot):
+                                if t[0] == save_t[0]:
+                                    track2_tot.pop(i)
                     if track.buffer > 4:
                         if id_remove1 == False:
                             track.add_detection(matched_det1)
@@ -180,7 +191,7 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                 else:
                     tracks1.remove(track)
             # Removing the cars that disappear from the frames
-            if not matched_det1 and track.id < max_track1:
+            if not matched_det1 and track.id < max_track:
                 track.count = track.count + 1
                 if track.count >= 10:
                     tracks1.remove(track)
@@ -196,11 +207,11 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                     and (new_bb.bbox[3]-new_bb.bbox[1]) < wz[1] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) > wz[0] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) < wz[1]:
-                new_bb.id = max_track1 + 1
-                new_track = Track(max_track1 + 1, [new_bb])
+                new_bb.id = max_track + 1
+                new_track = Track(max_track + 1, [new_bb])
                 tracks1.append(new_track)
 
-                max_track1 += 1
+                max_track += 1
 
         for track in tracks2:
             # Comparing the detections of the current frame with the previous frame and choose the better matched
@@ -222,17 +233,18 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                         for i, t in enumerate(track2_tot):
                             if t[0] == track.id:
                                 track2_tot[i] = [t[0], matched_det2, img2]
-                        max_good = 0
+                        max_good = []
                         for t in track1_tot:
                             good = matches(t[2], img2 , t[1], matched_det2)
-                            print(good)
-
-                            if good > max_good:
+                            print(len(good))
+                            if len(good) > len(max_good):
                                 max_good = good
                                 save_t = t
-                        if max_good > 0.30:
+                        if len(max_good) > 4:
                             track.id = save_t[0]
-
+                            for i, t in enumerate(track1_tot):
+                                if t[0] == save_t[0]:
+                                    track1_tot.pop(i)
                     if track.buffer > 4:
                         if id_remove2 == False:
                             track.add_detection(matched_det2)
@@ -240,7 +252,7 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                 else:
                     tracks2.remove(track)
             # Removing the cars that disappear from the frames
-            if not matched_det2 and track.id < max_track2:
+            if not matched_det2 and track.id < max_track:
                 track.count = track.count + 1
                 if track.count >= 10:
                     tracks2.remove(track)
@@ -256,11 +268,11 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                     and (new_bb.bbox[3]-new_bb.bbox[1]) < wz[3] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) > wz[2] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) < wz[3]:
-                new_bb.id = max_track2 + 1
-                new_track = Track(max_track2 + 1, [new_bb])
+                new_bb.id = max_track + 1
+                new_track = Track(max_track + 1, [new_bb])
                 tracks2.append(new_track)
 
-                max_track2 += 1
+                max_track += 1
 
         frame_det1, frame_det2 = [], []
         for track in frame_tracks1:
