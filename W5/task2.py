@@ -44,9 +44,36 @@ def detector(image_A, image_B, detector = 'sift'):
     if detector == 'sift':
         # Initiate SIFT detector
         sift = cv2.SIFT_create()
+        print(detector)
         # find the keypoints and descriptors with SIFT
         kp1, des1 = sift.detectAndCompute(image_A, None)
         kp2, des2 = sift.detectAndCompute(image_B, None)
+        # BFMatcher with default params
+        bf = cv2.BFMatcher()
+
+        matches = bf.knnMatch(des1, des2, k=2)
+
+    elif detector == 'orb':
+        # Initiate STAR detector
+        orb = cv2.ORB_create()
+        print(detector)
+
+        # compute the descriptors with ORB
+        kp1, des1 = orb.detectAndCompute(image_A, None)
+        kp2, des2 = orb.detectAndCompute(image_B, None)
+        # BFMatcher with default params
+        bf = cv2.BFMatcher()
+
+        matches = bf.knnMatch(des1, des2, k=2)
+
+    elif detector == 'surf':
+        # Initiate STAR detector
+        surf = cv2.xfeatures2d.SURF_create(400)
+        print(detector)
+
+        # compute the descriptors with ORB
+        kp1, des1 = surf.detectAndCompute(image_A, None)
+        kp2, des2 = surf.detectAndCompute(image_B, None)
         # BFMatcher with default params
         bf = cv2.BFMatcher()
 
@@ -88,7 +115,7 @@ def matches(imageA, imageB, bboxA, bboxB):
         cv2.imshow('tracking detections 2', cv2.resize(imageB, (900, 600)))
         cv2.waitKey(0)'''
 
-        matches = detector(imageA, imageB)
+        matches = detector(imageA, imageB, detector='sift')
         '''# Initiate SIFT detector
         sift = cv2.SIFT_create()
         # find the keypoints and descriptors with SIFT
@@ -101,7 +128,7 @@ def matches(imageA, imageB, bboxA, bboxB):
         # Apply ratio test
         good = []
         for m, n in matches:
-            if m.distance < 0.75 * n.distance:
+            if m.distance < 0.9 * n.distance:
                 good.append([m])
     except:
         good = []
@@ -109,7 +136,7 @@ def matches(imageA, imageB, bboxA, bboxB):
     return good
 
 
-def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = False, wz = 0, model='yolo3', seq = 'S03'):
+def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011', 'c012'], op = False, wz = 0, model='yolo3', seq = 'S03'):
     # Reading inputs.
     # If you need to save the frames --> save_frames = True. False == reading from path
     if save_frames:
@@ -196,11 +223,15 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                             if len(good) > len(max_good):
                                 max_good = good
                                 save_t = t
-                        if len(max_good) > 4:
+                        if len(max_good) > 25:
+                            remove_id = track.id
                             track.id = save_t[0]
                             for i, t in enumerate(track2_tot):
                                 if t[0] == save_t[0]:
                                     track2_tot.pop(i)
+                            for i, t in enumerate(track1_tot):
+                                if t[0] == remove_id:
+                                    track1_tot.pop(i)
                     if track.buffer > 4:
                         if id_remove1 == False:
                             track.add_detection(matched_det1)
@@ -252,16 +283,20 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
                                 track2_tot[i] = [t[0], matched_det2, img2]
                         max_good = []
                         for t in track1_tot:
-                            good = matches(t[2], img2 , t[1], matched_det2)
+                            good = matches(t[2], img2, t[1], matched_det2)
                             print(len(good))
                             if len(good) > len(max_good):
                                 max_good = good
                                 save_t = t
-                        if len(max_good) > 4:
+                        if len(max_good) > 25:
+                            remove_id2 = track.id
                             track.id = save_t[0]
                             for i, t in enumerate(track1_tot):
                                 if t[0] == save_t[0]:
                                     track1_tot.pop(i)
+                            for i, t in enumerate(track2_tot):
+                                if t[0] == remove_id2:
+                                    track2_tot.pop(i)
                     if track.buffer > 4:
                         if id_remove2 == False:
                             track.add_detection(matched_det2)
@@ -350,7 +385,7 @@ if __name__ == '__main__':
 
         th = [0.96]
         model = 'yolo3'
-        cam = ['c010', 'c011']
+        cam = ['c010', 'c011', 'c012', 'c013', 'c014', 'c015']
         seq = 'S03'
         
         '''
@@ -376,7 +411,7 @@ if __name__ == '__main__':
         #cam2 --> mask[2], mask[3]
         #same wz
 
-        mask = [150, 0, 800, 1300]
+        mask = [150, 500, 800, 1300]
         wz = [75, 1500, 100, 1500]
 
         path_to_video = '../datasets/aic19-track1-mtmc-train/train/{}/{}/vdo.avi'.format(seq, cam[0])
