@@ -188,13 +188,14 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011', 'c012'
     track1_tot, track2_tot = [],[]
 
     a = int(video_n_frames * 0.25)
-    for frame in range(int(500), int(video_n_frames)):
+    for frame in range(int(0), int(video_n_frames)):
 
         det1 = det_file1.get(frame, [])
         img1 = cv2.imread(path_to_frames + ('/frame_{:04d}.jpg'.format(frame + 1)))
 
         det2 = det_file2.get(frame, [])
-        img2 = cv2.imread(path_to_frames2 + ('/frame_{:04d}.jpg'.format(frame + 1)))
+        path2 = os.path.join(path_to_frames2, ('/frame_{:04d}.jpg'.format(frame + 1)))
+        img2 = cv2.imread(path2)
 
         frame_tracks1, frame_tracks2 = [], []
         for track in tracks1:
@@ -389,8 +390,10 @@ if __name__ == '__main__':
 
         th = [0.96]
         model = 'yolo3'
-        cam = ['c010', 'c011']
-        seq = 'S03'
+        cam = ['c026', 'c027']
+        #cam = ['c010', 'c011']
+        #seq = 'S03
+        seq = 'S04'
         
         '''
         'c010':
@@ -414,8 +417,8 @@ if __name__ == '__main__':
         #cam1 --> mask[0],mask[1]
         #cam2 --> mask[2], mask[3]
         #same wz
-
-        mask = [150, 500, 800, 1300]
+        mask = [1920, 700]
+        #mask = [150, 500, 800, 1300]
         wz = [75, 1500, 100, 1500]
 
         path_to_video = '../datasets/aic19-track1-mtmc-train/train/{}/{}/vdo.avi'.format(seq, cam[0])
