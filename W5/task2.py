@@ -424,6 +424,7 @@ if __name__ == '__main__':
         #cam2 --> mask[2], mask[3]
         #same wz
         #mask = [1920, 700]
+        # Si seq =! S03 mask = [0,0,0,0]
         mask = [150, 500, 800, 1300]
         wz = [75, 1500, 100, 1500]
 
@@ -432,4 +433,4 @@ if __name__ == '__main__':
         path_to_frames2 = '../datasets/{}/'.format(cam[1])
 
         for t in th:
-            task2(path_to_frames2= path_to_frames2,save_frames=True, th=t, mask=mask, op=False, cam=cam, wz=wz, model=model, seq=seq)
+            task2(path_to_frames2= path_to_frames2,save_frames=False, th=t, mask=[0, 0, 0, 0], op=False, cam=cam, wz=wz, model=model, seq=seq)
