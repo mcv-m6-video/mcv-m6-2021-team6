@@ -370,10 +370,6 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011', 'c012'
 
     ap, prec, rec = mean_average_precision(gt_bb1, bb_frames1)
 
-    mh = mm.metrics.create()
-    #summary = mh.compute(acc1, metrics=['num_frames', 'idf1', 'idp', 'idr', 'motp', 'mota', 'precision', 'recall'],
-                         #name='acc')
-
     metrics = acc1.get_metrics()
     print('IDF1: ', metrics.idf1['acc'])
     print('IDP: ', metrics.idp['acc'])
@@ -393,7 +389,7 @@ if __name__ == '__main__':
 
         th = [0.96]
         model = 'yolo3'
-        cam = ['c010', 'c011', 'c012', 'c013', 'c014', 'c015']
+        cam = ['c010', 'c011']
         seq = 'S03'
         
         '''
