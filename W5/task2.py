@@ -349,10 +349,18 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011', 'c012'
         moc_pred1.append(frame_det1)
         moc_gt1.append(gt_file1.get(frame, []))
         acc1.update(moc_gt1[-1], moc_pred1[-1])
+        # IDF1
+        moc_pred2.append(frame_det2)
+        moc_gt2.append(gt_file2.get(frame, []))
+        acc2.update(moc_gt2[-1], moc_pred2[-1])
 
-        if False:
-            cv2.imshow('tracking detections 1', cv2.resize(img1, (900, 600)))
-            cv2.imshow('tracking detections 2', cv2.resize(img2, (900, 600)))
+        if True:
+            a = cv2.resize(img1, (700, 400))
+            b = cv2.resize(img2, (700, 400))
+            #cv2.imshow('tracking detections 1', cv2.resize(img1, (700, 400)))
+            #cv2.imshow('tracking detections 2', cv2.resize(img2, (700, 400)))
+            total = np.concatenate((a, b), axis=1)
+            cv2.imshow('Tracking', cv2.resize(total, (1000, 500)))
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
 
