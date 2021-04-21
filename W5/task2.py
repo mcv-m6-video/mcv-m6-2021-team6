@@ -187,8 +187,11 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
     acc2 = MOTAcumulator()
     track1_tot, track2_tot = [],[]
 
-    a = int(video_n_frames * 0.25)
-    for frame in range(int(0), int(video_n_frames)):
+    rng = [len(os.listdir(path_to_frames)), len(os.listdir(path_to_frames2))]
+
+    a = min(rng)
+
+    for frame in range(int(0), a):
 
         det1 = det_file1.get(frame, [])
         path1 = path_to_frames + ('/frame_{:04d}.jpg'.format(frame + 1))
@@ -391,10 +394,12 @@ if __name__ == '__main__':
 
         th = [0.96]
         model = 'yolo3'
-        cam = ['c028', 'c029']
+        cam = ['c002', 'c001']
+        #cam = ['c039', 'c040']
         #cam = ['c010', 'c011']
+        seq = 'S01'
         #seq = 'S03
-        seq = 'S04'
+        #seq = 'S04'
         
         '''
         'c010':
@@ -427,4 +432,4 @@ if __name__ == '__main__':
         path_to_frames2 = '../datasets/{}/'.format(cam[1])
 
         for t in th:
-            task2(path_to_frames2= path_to_frames2,save_frames=False, th=t, mask=mask, op=False, cam=cam, wz=wz, model=model, seq=seq)
+            task2(path_to_frames2= path_to_frames2,save_frames=True, th=t, mask=mask, op=False, cam=cam, wz=wz, model=model, seq=seq)
