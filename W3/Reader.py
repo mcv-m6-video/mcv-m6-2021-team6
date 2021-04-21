@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 import numpy as np
-from BoundingBox import *
+from W3.BoundingBox import *
 import xmltodict
 
 

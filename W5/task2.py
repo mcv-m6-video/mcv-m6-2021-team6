@@ -8,6 +8,7 @@ import motmetrics as mm
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
+
 #Class from group two of 2020.
 class MOTAcumulator:
 
@@ -36,8 +37,23 @@ class MOTAcumulator:
 
     def get_metrics(self):
         mh = mm.metrics.create()
-        summary = mh.compute(self.acc, metrics=['idf1', 'idp', 'precision', 'recall'], name='acc')
+        summary = mh.compute(self.acc, metrics=['idf1', 'idp', 'idr', 'precision', 'recall'], name='acc')
         return summary
+
+def detector(image_A, image_B, detector = 'sift'):
+    if detector == 'sift':
+        # Initiate SIFT detector
+        sift = cv2.SIFT_create()
+        # find the keypoints and descriptors with SIFT
+        kp1, des1 = sift.detectAndCompute(image_A, None)
+        kp2, des2 = sift.detectAndCompute(image_B, None)
+        # BFMatcher with default params
+        bf = cv2.BFMatcher()
+
+        matches = bf.knnMatch(des1, des2, k=2)
+
+    return matches
+
 
 def matches(imageA, imageB, bboxA, bboxB):
 
@@ -68,11 +84,12 @@ def matches(imageA, imageB, bboxA, bboxB):
         imageB = cv2.resize(imageB, (100, 100))
         # imageB = cv2.cvtColor(imageB, cv2.COLOR_BGR2YCrCb)
 
-        cv2.imshow('tracking detections 1', cv2.resize(imageA, (900, 600)))
+        '''cv2.imshow('tracking detections 1', cv2.resize(imageA, (900, 600)))
         cv2.imshow('tracking detections 2', cv2.resize(imageB, (900, 600)))
-        cv2.waitKey(0)
+        cv2.waitKey(0)'''
 
-        # Initiate SIFT detector
+        matches = detector(imageA, imageB)
+        '''# Initiate SIFT detector
         sift = cv2.SIFT_create()
         # find the keypoints and descriptors with SIFT
         kp1, des1 = sift.detectAndCompute(imageA, None)
@@ -80,7 +97,7 @@ def matches(imageA, imageB, bboxA, bboxB):
         # BFMatcher with default params
         bf = cv2.BFMatcher()
 
-        matches = bf.knnMatch(des1, des2, k=2)
+        matches = bf.knnMatch(des1, des2, k=2)'''
         # Apply ratio test
         good = []
         for m, n in matches:
@@ -110,7 +127,7 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
 
     video_n_frames = len(glob.glob1(path_to_frames, "*.jpg"))
     # Reading the groundtruth and getting the Bounding Boxes per frame cam1
-    reader1 = AICityChallengeAnnotationReader(path='datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[0]))
+    reader1 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[0]))
     gt_file1 = reader1.get_annotations(classes=['car'])
     gt_bb1 = []
     for frame in range(int(500), int(video_n_frames)):
@@ -118,7 +135,7 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
         gt_bb1.append(annotations)
 
     # Reading the groundtruth and getting the Bounding Boxes per frame cam1
-    reader2 = AICityChallengeAnnotationReader(path='datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[1]))
+    reader2 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[1]))
     gt_file2 = reader1.get_annotations(classes=['car'])
     gt_bb2 = []
     for frame in range(int(500), int(video_n_frames)):
@@ -126,11 +143,11 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
         gt_bb2.append(annotations)
 
     # Reading the detections cam1
-    reader1 = AICityChallengeAnnotationReader(path='datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[0], model))
+    reader1 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[0], model))
     det_file1 = reader1.get_annotations(classes=['car'])
 
     # Reading the detections cam2
-    reader2 = AICityChallengeAnnotationReader(path='datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[1], model))
+    reader2 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[1], model))
     det_file2 = reader2.get_annotations(classes=['car'])
 
     bb_frames1, bb_frames2 = [], []
@@ -158,7 +175,7 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
             matched_det1, id_remove1 = matched_bbox_mov(track.last_detection(), det1, th)
 
             if matched_det1:
-                if (matched_det1.bbox[3] > mask[0] \
+                if (matched_det1.bbox[3] > mask[0]\
                     and matched_det1.bbox[2] > mask[1]) \
                         and (matched_det1.bbox[3] - matched_det1.bbox[1]) > wz[0] \
                         and (matched_det1.bbox[2] - matched_det1.bbox[0]) > wz[0]:
@@ -298,7 +315,7 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
         moc_gt1.append(gt_file1.get(frame, []))
         acc1.update(moc_gt1[-1], moc_pred1[-1])
 
-        if True:
+        if False:
             cv2.imshow('tracking detections 1', cv2.resize(img1, (900, 600)))
             cv2.imshow('tracking detections 2', cv2.resize(img2, (900, 600)))
             if cv2.waitKey(10) & 0xFF == ord('q'):
@@ -310,10 +327,24 @@ def task2(save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011'], op = 
 
     ap, prec, rec = mean_average_precision(gt_bb1, bb_frames1)
 
+    mh = mm.metrics.create()
+    #summary = mh.compute(acc1, metrics=['num_frames', 'idf1', 'idp', 'idr', 'motp', 'mota', 'precision', 'recall'],
+                         #name='acc')
+
+    metrics = acc1.get_metrics()
+    print('IDF1: ', metrics.idf1['acc'])
+    print('IDP: ', metrics.idp['acc'])
+    print('IDR: ', metrics.idr['acc'])
+    print('Precision: ', metrics.precision['acc'])
+    print('Recall: ', metrics.recall['acc'])
+
+
+
+
     print('{} AP {}: '.format(model, cam), ap)
     print('{} IoU {}: '.format(model, cam), iou[0])
-    print('\nAdditional metrics IDF1 {}:'.format(cam))
-    print(acc1.get_idf1())
+    '''print('\nAdditional metrics IDF1 {}:'.format(cam))
+    print(acc1.get_idf1())'''
 
 if __name__ == '__main__':
 
@@ -348,9 +379,9 @@ if __name__ == '__main__':
         mask = [150, 0, 800, 1300]
         wz = [75, 1500, 100, 1500]
 
-        path_to_video = 'datasets/aic19-track1-mtmc-train/train/{}/{}/vdo.avi'.format(seq, cam[0])
-        path_to_frames = 'datasets/{}/'.format(cam[0])
-        path_to_frames2 = 'datasets/{}/'.format(cam[1])
+        path_to_video = '../datasets/aic19-track1-mtmc-train/train/{}/{}/vdo.avi'.format(seq, cam[0])
+        path_to_frames = '../datasets/{}/'.format(cam[0])
+        path_to_frames2 = '../datasets/{}/'.format(cam[1])
 
         for t in th:
             task2(save_frames=False, th=t, mask=mask, op=False, cam=cam, wz=wz, model=model, seq=seq)
