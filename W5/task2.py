@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
 
-#Class from group two of 2020.
+# Class from group two of 2020.
 class MOTAcumulator:
 
     def __init__(self):
@@ -40,7 +40,9 @@ class MOTAcumulator:
         summary = mh.compute(self.acc, metrics=['idf1', 'idp', 'idr', 'precision', 'recall'], name='acc')
         return summary
 
-def detector(image_A, image_B, detector = 'sift'):
+
+
+def detector(image_A, image_B, detector='sift'):
     if detector == 'sift':
         # Initiate SIFT detector
         sift = cv2.SIFT_create()
@@ -83,7 +85,6 @@ def detector(image_A, image_B, detector = 'sift'):
 
 
 def matches(imageA, imageB, bboxA, bboxB):
-
     '''
     try:
         cv2.imshow('tracking detections 1', cv2.resize(imageA, (900, 600)))
@@ -136,7 +137,8 @@ def matches(imageA, imageB, bboxA, bboxB):
     return good
 
 
-def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010', 'c011', 'c012'], op = False, wz = 0, model='yolo3', seq = 'S03'):
+def task2(path_to_frames2, save_frames=False, th=1, mask=[0, 0], cam=['c010', 'c011', 'c012'], op=False, wz=0,
+          model='yolo3', seq='S03'):
     # Reading inputs.
     # If you need to save the frames --> save_frames = True. False == reading from path
     if save_frames:
@@ -154,7 +156,8 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
 
     video_n_frames = len(glob.glob1(path_to_frames, "*.jpg"))
     # Reading the groundtruth and getting the Bounding Boxes per frame cam1
-    reader1 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[0]))
+    reader1 = AICityChallengeAnnotationReader(
+        path='../datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[0]))
     gt_file1 = reader1.get_annotations(classes=['car'])
     gt_bb1 = []
     for frame in range(int(500), int(video_n_frames)):
@@ -162,7 +165,8 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
         gt_bb1.append(annotations)
 
     # Reading the groundtruth and getting the Bounding Boxes per frame cam1
-    reader2 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[1]))
+    reader2 = AICityChallengeAnnotationReader(
+        path='../datasets/aic19-track1-mtmc-train/train/{}/{}/gt/gt.txt'.format(seq, cam[1]))
     gt_file2 = reader1.get_annotations(classes=['car'])
     gt_bb2 = []
     for frame in range(int(500), int(video_n_frames)):
@@ -170,11 +174,13 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
         gt_bb2.append(annotations)
 
     # Reading the detections cam1
-    reader1 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[0], model))
+    reader1 = AICityChallengeAnnotationReader(
+        path='../datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[0], model))
     det_file1 = reader1.get_annotations(classes=['car'])
 
     # Reading the detections cam2
-    reader2 = AICityChallengeAnnotationReader(path='../datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[1], model))
+    reader2 = AICityChallengeAnnotationReader(
+        path='../datasets/aic19-track1-mtmc-train/train/{}/{}/mtsc/mtsc_tc_{}.txt'.format(seq, cam[1], model))
     det_file2 = reader2.get_annotations(classes=['car'])
 
     bb_frames1, bb_frames2 = [], []
@@ -185,12 +191,12 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
     # Create an accumulator that will be updated during each frame
     acc1 = MOTAcumulator()
     acc2 = MOTAcumulator()
-    track1_tot, track2_tot = [],[]
+    track1_tot, track2_tot = [], []
 
     rng = [len(os.listdir(path_to_frames)), len(os.listdir(path_to_frames2))]
 
     a = min(rng)
-
+    i = 0
     for frame in range(int(0), a):
 
         det1 = det_file1.get(frame, [])
@@ -207,7 +213,7 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
             matched_det1, id_remove1 = matched_bbox_mov(track.last_detection(), det1, th)
 
             if matched_det1:
-                if (matched_det1.bbox[3] > mask[0]\
+                if (matched_det1.bbox[3] > mask[0] \
                     and matched_det1.bbox[2] > mask[1]) \
                         and (matched_det1.bbox[3] - matched_det1.bbox[1]) > wz[0] \
                         and (matched_det1.bbox[2] - matched_det1.bbox[0]) > wz[0]:
@@ -255,9 +261,9 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
 
         # New track detection
         for new_bb in det1:
-            if (new_bb.bbox[3] > mask[0] and new_bb.bbox[2] > mask[1])\
-                    and (new_bb.bbox[3]-new_bb.bbox[1]) > wz[0] \
-                    and (new_bb.bbox[3]-new_bb.bbox[1]) < wz[1] \
+            if (new_bb.bbox[3] > mask[0] and new_bb.bbox[2] > mask[1]) \
+                    and (new_bb.bbox[3] - new_bb.bbox[1]) > wz[0] \
+                    and (new_bb.bbox[3] - new_bb.bbox[1]) < wz[1] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) > wz[0] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) < wz[1]:
                 new_bb.id = max_track + 1
@@ -320,9 +326,9 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
 
         # New track detection
         for new_bb in det2:
-            if (new_bb.bbox[3] > mask[2] and new_bb.bbox[2] > mask[3])\
-                    and (new_bb.bbox[3]-new_bb.bbox[1]) > wz[2] \
-                    and (new_bb.bbox[3]-new_bb.bbox[1]) < wz[3] \
+            if (new_bb.bbox[3] > mask[2] and new_bb.bbox[2] > mask[3]) \
+                    and (new_bb.bbox[3] - new_bb.bbox[1]) > wz[2] \
+                    and (new_bb.bbox[3] - new_bb.bbox[1]) < wz[3] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) > wz[2] \
                     and (new_bb.bbox[2] - new_bb.bbox[0]) < wz[3]:
                 new_bb.id = max_track + 1
@@ -362,14 +368,18 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
         if True:
             a = cv2.resize(img1, (700, 400))
             b = cv2.resize(img2, (700, 400))
-            #cv2.imshow('tracking detections 1', cv2.resize(img1, (700, 400)))
-            #cv2.imshow('tracking detections 2', cv2.resize(img2, (700, 400)))
+            # cv2.imshow('tracking detections 1', cv2.resize(img1, (700, 400)))
+            # cv2.imshow('tracking detections 2', cv2.resize(img2, (700, 400)))
+
             total = np.concatenate((a, b), axis=1)
-            cv2.imshow('Tracking', cv2.resize(total, (1000, 500)))
+            cv2.imwrite(f'../W5/outs/S04/out_cam_c39_frame{i}.jpg', total)
+            i+=1
+            #cv2.imshow('Tracking', cv2.resize(total, (1000, 500)))
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
 
         bb_frames1.append(frame_det1)
+
 
     iou = compute_iou_over_time(gt_bb1, bb_frames1)
 
@@ -382,26 +392,24 @@ def task2(path_to_frames2,save_frames=False, th = 1, mask = [0, 0],cam = ['c010'
     print('Precision: ', metrics.precision['acc'])
     print('Recall: ', metrics.recall['acc'])
 
-
-
-
     print('{} AP {}: '.format(model, cam), ap)
     print('{} IoU {}: '.format(model, cam), iou[0])
     '''print('\nAdditional metrics IDF1 {}:'.format(cam))
     print(acc1.get_idf1())'''
 
+
 if __name__ == '__main__':
 
-        th = [0.96]
-        model = 'yolo3'
-        cam = ['c002', 'c001']
-        #cam = ['c039', 'c040']
-        #cam = ['c010', 'c011']
-        seq = 'S01'
-        #seq = 'S03
-        #seq = 'S04'
-        
-        '''
+    th = [0.96]
+    model = 'yolo3'
+    # cam = ['c014', 'c015']
+    cam = ['c039', 'c040']
+    #cam = ['c001', 'c002']
+    #seq = 'S01'
+    #seq = 'S03'
+    seq = 'S04'
+
+    '''
         'c010':
             mask = [150, 0]
             wz = [75, 1500]
@@ -420,17 +428,18 @@ if __name__ == '__main__':
         'c015':
             mask = [850, 500]
         '''
-        #cam1 --> mask[0],mask[1]
-        #cam2 --> mask[2], mask[3]
-        #same wz
-        #mask = [1920, 700]
-        # Si seq =! S03 mask = [0,0,0,0]
-        mask = [150, 500, 800, 1300]
-        wz = [75, 1500, 100, 1500]
+    # cam1 --> mask[0],mask[1]
+    # cam2 --> mask[2], mask[3]
+    # same wz
+    # mask = [1920, 700]
+    # Si seq =! S03 mask = [0,0,0,0]
+    mask = [150, 500, 800, 1300]
+    wz = [75, 1500, 100, 1500]
 
-        path_to_video = '../datasets/aic19-track1-mtmc-train/train/{}/{}/vdo.avi'.format(seq, cam[0])
-        path_to_frames = '../datasets/{}/'.format(cam[0])
-        path_to_frames2 = '../datasets/{}/'.format(cam[1])
+    path_to_video = '../datasets/aic19-track1-mtmc-train/train/{}/{}/vdo.avi'.format(seq, cam[0])
+    path_to_frames = '../datasets/{}/'.format(cam[0])
+    path_to_frames2 = '../datasets/{}/'.format(cam[1])
 
-        for t in th:
-            task2(path_to_frames2= path_to_frames2,save_frames=False, th=t, mask=[0, 0, 0, 0], op=False, cam=cam, wz=wz, model=model, seq=seq)
+    for t in th:
+        task2(path_to_frames2=path_to_frames2, save_frames=False, th=t, mask=[0, 0, 0, 0], op=False, cam=cam, wz=wz,
+              model=model, seq=seq)
