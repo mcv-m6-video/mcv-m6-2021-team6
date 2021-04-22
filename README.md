@@ -2,7 +2,7 @@
 <ul>
   <li>Daniel Fuentes: daanyfuentes@gmail.com </li>
   <li>Daniel Yuste: danielyustegalvez@gmail.com </li>
-  <li>[Isaac Pérez](https://github.com/ipesanz)</li>
+  <li><a href="https://github.com/ipesanz">Isaac Pérez</a></li>
   <li>Sergi Garcia: sergidipi@gmail.com </li>
 </ul>
 
