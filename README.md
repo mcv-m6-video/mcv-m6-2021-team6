@@ -2,20 +2,19 @@
 <ul>
   <li>Daniel Fuentes: daanyfuentes@gmail.com </li>
   <li>Daniel Yuste: danielyustegalvez@gmail.com </li>
-  <li>Isaac Pérez: ipesanz@gmail.com </li>
+  <li>[Isaac Pérez](https://github.com/ipesanz)</li>
   <li>Sergi Garcia: sergidipi@gmail.com </li>
 </ul>
 
 
-## Tasks W5 (from slides):
-
-- [ ] T1 - Multi-target single-camera (MTSC) tracking
-- [ ] T2 - Multi-target multi-camera (MTMC) tracking
-- [ ] T3 - Final deliverables
-- [ ] T3.1 - Writing skills
-- [ ] T3.2 - Software on github repo
-
+## Results obtained:
 
 [Presentation](https://docs.google.com/presentation/d/1aU-1_J8-TkcwG78auCCrVxdEHGYVX8jjovoIKQD9pC4/edit?usp=sharing)
 
 [Report]()
+
+**S03 - c010 & c011**
+![seq3_c010](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/gif_w5_s3_c10_and_11.gif)
+
+**S04 - c038 & c040**
+![seq4_c038](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/gif_w5_s4_c38_and_c40.gif)
