@@ -4,7 +4,7 @@ from collections import defaultdict, OrderedDict
 import numpy as np
 import xmltodict
 
-from utils.detection import Detection
+from _old.utils.detection import Detection
 
 
 def parse_annotations_from_xml(path):
@@ -112,10 +112,10 @@ class AICityChallengeAnnotationReader:
 
 
 if __name__ == '__main__':
-    reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/Anotation_40secs_AICITY_S03_C010.xml')
+    reader = AICityChallengeAnnotationReader(path='../../datasets/AICity_data/train/S03/c010/Anotation_40secs_AICITY_S03_C010.xml')
     gt = reader.get_annotations(classes=['car'])
     #gt_noisy = reader.get_annotations(classes=['car'], noise_params={'drop': 0.05, 'mean': 0, 'std': 10})
-    reader = AICityChallengeAnnotationReader(path='../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')
+    reader = AICityChallengeAnnotationReader(path='../../datasets/AICity_data/train/S03/c010/det/det_mask_rcnn.txt')
     det = reader.get_annotations(classes=['car'])
 
     import cv2

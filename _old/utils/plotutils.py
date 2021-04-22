@@ -5,7 +5,7 @@ import cv2
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-from evaluation.intersection_over_union import mean_intersection_over_union
+from W3.evaluation.intersection_over_union import mean_intersection_over_union
 
 
 def video_iou_plot(gt, det, video_path, title='', save_path=None):

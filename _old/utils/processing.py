@@ -1,6 +1,6 @@
 import cv2
 
-from utils.detection import Detection
+from _old.utils.detection import Detection
 
 
 def postprocess(mask):
