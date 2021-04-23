@@ -1,11 +1,109 @@
+# M6 Project: Video Surveillance for Road Traffic Monitoring 
 ## Group 06
-<ul>
-  <li>Daniel Fuentes: daanyfuentes@gmail.com </li>
-  <li>Daniel Yuste: danielyustegalvez@gmail.com </li>
-  <li><a href="https://github.com/ipesanz">Isaac Pérez</a></li>
-  <li>Sergi Garcia: sergidipi@gmail.com </li>
-</ul>
 
+### Team members:
+* _Daniel Fuentes_ - daanyfuentes@gmail.com - [DanielFuentes16](https://github.com/DanielFuentes16)
+* _Daniel Yuste_ - danielyustegalvez@gmail.com - [DanielYG](https://github.com/DanielYG)
+* _Sergi Garcia Sarroca_ - g.garcia.sarroca@gmail.com - [SoftonCV](https://github.com/SoftonCV)
+* _Isaac Pérez Sanz_ - rv.antoni@hotmail.com - [ipesanz](https://github.com/ipesanz)
+
+# Week 1: Evaluation Metrics: 
+
+Main Tasks: 
+
+(a) Detection metrics: 
+
+ - [] IoU & mAP for (ground truth + noise)
+ - [] mAP for provided object detections
+
+(b) Detection metrics. Temporal analysis:
+
+ - [] IoU vs time
+
+(c) Optical flow evaluation metrics:
+
+ - [x] MSEN: Mean Square Error in Non-occluded areas
+ - [x] PEPN: Percentage of Erroneous Pixels in Non-occluded areas 
+ - [x] Analysis & Visualizations
+
+(d) Visual representation optical flow:
+
+ - [x] Optical Flow Plot
+
+ 
+# Week 2: Bakckground Substraction: 
+
+Main Tasks: 
+
+Update Missing Work from Week 1 : 
+
+(a) Detection metrics: 
+
+ - [x] IoU & mAP for (ground truth + noise)
+ - [x] mAP for provided object detections
+
+(b) Detection metrics. Temporal analysis:
+
+ - [x] IoU vs time
+
+Week 2 tasks: 
+
+(a) Background Estimation: 
+
+ - [x] Gaussian Modelling
+ - [x] Evaluation
+
+(b) Stauffer & Grimson:
+
+ - [x] Adaptive Modelling
+ - [x] Comparison with task (a)
+ 
+ (c) Comparison with state-of-the-art
+ 
+ (d) Adding Color Spaces
+
+
+# Week 3: Segmentation, Object Detection & Tracking: 
+
+Main Tasks: 
+
+(a) Object detection:
+
+ - [x] Off-the-Shelf
+ - [x] Fine-tune to your data
+
+(b) Object tracking
+
+# Week 4: OpticalFlow & Tracking:
+
+(a) Optical Flow:
+
+ - [x] Optical Flow with Block Matching
+ - [x] Off-the-Shelf Optical Flow
+
+(b) Video stabilization:
+
+ - [x] Video stabilization with Block Matching
+ - [x] Off-the-shelf Stabilization
+
+(c) Object Tracking: 
+
+ - [x] Object Tracking with Optical Flow
+
+
+# Week 5: Single-Camera & Multi-Camera Tracking:
+
+In this week we performed a method to compute single camera tracking and modify this method by using feature extractors in order to compute MTMC. 
+
+Main tasks:
+
+(a) Multi-target single-camera (MTSC) tracking:
+
+ - [x] Read the Data & Evaluation description for Track 3 (Multiple-camera tracking).
+ - [x] Obtain results for SEQ 1 & SEQ 4
+
+
+(b)  Multi-target multi-camera (MTMC) tracking
 
 ## Results obtained:
 
@@ -18,3 +116,8 @@
 
 **S04 - c038 & c040**
 ![seq4_c038](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/gif_w5_s4_c38_and_c40.gif)
+
+
+- Slides for the project: [T06-Google Slides](https://docs.google.com/presentation/d/1aU-1_J8-TkcwG78auCCrVxdEHGYVX8jjovoIKQD9pC4/edit#slide=id.p)
+
+- Link to the Overleaf article (non-editable): [Group06-Overleaf]()
