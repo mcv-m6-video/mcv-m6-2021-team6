@@ -103,8 +103,6 @@ Main Tasks:
 
 # Week 5: Single-Camera & Multi-Camera Tracking:
 
-In this week we performed a method to compute single camera tracking and modify this method by using feature extractors in order to compute MTMC. 
-
 Main tasks:
 
 (a) Multi-target single-camera (MTSC) tracking:
