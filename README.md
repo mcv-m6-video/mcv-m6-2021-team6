@@ -7,6 +7,16 @@
 * _Sergi García Sarroca_ - g.garcia.sarroca@gmail.com - [SoftonCV](https://github.com/SoftonCV)
 * _Isaac Pérez Sanz_ - rv.antoni@hotmail.com - [ipesanz](https://github.com/ipesanz)
 
+## Project DEscription: 
+
+This project is related to basic concepts and techniques related to video sequences mainly for surveillance applications. It contains the work of the authors along 5 weeks achieving different objectives: 
+
+- The use of statistical models to estimate the background information of the video sequence.
+- Use of deep learning techniques to detect the foreground.
+- Use optical flow estimations and compensations. 
+- Track detections. 
+- Analyze system performance evaluation. 
+
 # Week 1: Evaluation Metrics: 
 
 Main Tasks: 
