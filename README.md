@@ -100,6 +100,16 @@ Main Tasks:
 
 (b) Object tracking
 
+## Visual Results:
+
+**Fast R-CNN**
+
+![Fast](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/task1_1_fast.gif)
+
+**Mask R-CNN**
+
+![Mask](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/task1_1_mask.gif)
+
 # Week 4: OpticalFlow & Tracking:
 
 (a) Optical Flow:
