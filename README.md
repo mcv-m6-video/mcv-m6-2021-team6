@@ -107,10 +107,6 @@ Main tasks:
 
 ## Results obtained:
 
-[Presentation](https://docs.google.com/presentation/d/1aU-1_J8-TkcwG78auCCrVxdEHGYVX8jjovoIKQD9pC4/edit?usp=sharing)
-
-[Report]()
-
 **S03 - c010 & c011**
 ![seq3_c010](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/gif_w5_s3_c10_and_11.gif)
 
