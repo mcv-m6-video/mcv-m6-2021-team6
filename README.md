@@ -7,7 +7,7 @@
 * _Sergi García Sarroca_ - g.garcia.sarroca@gmail.com - [SoftonCV](https://github.com/SoftonCV)
 * _Isaac Pérez Sanz_ - rv.antoni@hotmail.com - [ipesanz](https://github.com/ipesanz)
 
-## Project DEscription: 
+## Project Description: 
 
 This project is related to basic concepts and techniques related to video sequences mainly for surveillance applications. It contains the work of the authors along 5 weeks achieving different objectives: 
 
