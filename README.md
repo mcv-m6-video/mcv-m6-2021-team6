@@ -71,7 +71,12 @@ Week 2 tasks:
  (c) Comparison with state-of-the-art
  
  (d) Adding Color Spaces
+ 
+ **Visual Results:
+ 
+ ![Background Example](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/W2/bg_removal_a6_p0.2_6.gif)
 
+ ![Denoise](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/W2/try_dnoise.gif)
 
 # Week 3: Segmentation, Object Detection & Tracking: 
 
