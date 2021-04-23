@@ -40,7 +40,14 @@ Main Tasks:
 
  - [x] Optical Flow Plot
 
- 
+## Visual Results:
+
+**Optical Flow**
+![Optical Flow](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/week1.jpg)
+
+**Optical Flow Plot**
+![Optical Plot](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/week4_1.jpg)
+
 # Week 2: Bakckground Substraction: 
 
 Main Tasks: 
@@ -72,9 +79,13 @@ Week 2 tasks:
  
  (d) Adding Color Spaces
  
- **Visual Results:
+## Visual Results:
+ 
+ **Background Estimation**
  
  ![Background Example](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/W2/bg_removal_a6_p0.2_6.gif)
+ 
+ **Denoised Test**
 
  ![Denoise](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/W2/try_dnoise.gif)
 
@@ -105,6 +116,10 @@ Main Tasks:
 
  - [x] Object Tracking with Optical Flow
 
+**Visual Results:**
+
+**Optical Flow**
+![Optical](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/week4_1.jpg)
 
 # Week 5: Single-Camera & Multi-Camera Tracking:
 
@@ -118,7 +133,7 @@ Main tasks:
 
 (b)  Multi-target multi-camera (MTMC) tracking
 
-## Results obtained:
+## Visual Results:
 
 **S03 - c010 & c011**
 ![seq3_c010](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/gif_w5_s3_c10_and_11.gif)
