@@ -5,7 +5,7 @@
 * _Daniel Fuentes_ - daanyfuentes@gmail.com - [DanielFuentes16](https://github.com/DanielFuentes16)
 * _Daniel Yuste_ - danielyustegalvez@gmail.com - [DanielYG](https://github.com/DanielYG)
 * _Sergi García Sarroca_ - g.garcia.sarroca@gmail.com - [SoftonCV](https://github.com/SoftonCV)
-* _Isaac Pérez Sanz_ - rv.antoni@hotmail.com - [ipesanz](https://github.com/ipesanz)
+* _Isaac Pérez Sanz_ - [ipesanz](https://github.com/ipesanz)
 
 ## Project Description: 
 
@@ -159,4 +159,4 @@ Main tasks:
 
 - Slides for the project: [T06-Google Slides](https://docs.google.com/presentation/d/1aU-1_J8-TkcwG78auCCrVxdEHGYVX8jjovoIKQD9pC4/edit#slide=id.p)
 
-- Link to the Overleaf article (non-editable): [Group06-Overleaf]()
+- Link to the Overleaf article (non-editable): [Group06-Overleaf](https://www.overleaf.com/read/cnrkvrxzhvfj)
