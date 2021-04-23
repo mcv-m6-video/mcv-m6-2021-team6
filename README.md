@@ -46,7 +46,7 @@ Main Tasks:
 ![Optical Flow](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/week1.jpg)
 
 **Optical Flow Plot**
-![Optical Plot](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/week4_1.jpg)
+![Optical Plot](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/opticalFlow_plot.jpg)
 
 # Week 2: Bakckground Substraction: 
 
@@ -119,7 +119,12 @@ Main Tasks:
 **Visual Results:**
 
 **Optical Flow**
+
 ![Optical](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/week4_1.jpg)
+
+**Video Stabilization**
+
+![Video](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/img/unnamed.gif)
 
 # Week 5: Single-Camera & Multi-Camera Tracking:
 
