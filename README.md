@@ -4,7 +4,7 @@
 ### Team members:
 * _Daniel Fuentes_ - daanyfuentes@gmail.com - [DanielFuentes16](https://github.com/DanielFuentes16)
 * _Daniel Yuste_ - danielyustegalvez@gmail.com - [DanielYG](https://github.com/DanielYG)
-* _Sergi Garcia Sarroca_ - g.garcia.sarroca@gmail.com - [SoftonCV](https://github.com/SoftonCV)
+* _Sergi García Sarroca_ - g.garcia.sarroca@gmail.com - [SoftonCV](https://github.com/SoftonCV)
 * _Isaac Pérez Sanz_ - rv.antoni@hotmail.com - [ipesanz](https://github.com/ipesanz)
 
 # Week 1: Evaluation Metrics: 
