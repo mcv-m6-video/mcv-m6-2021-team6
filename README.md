@@ -159,4 +159,4 @@ Main tasks:
 
 - Slides for the project: [T06-Google Slides](https://docs.google.com/presentation/d/1aU-1_J8-TkcwG78auCCrVxdEHGYVX8jjovoIKQD9pC4/edit#slide=id.p)
 
-- Link to the Overleaf article (non-editable): [Group06-Overleaf](https://www.overleaf.com/read/cnrkvrxzhvfj)
+- Link to the article: [Group06-Report](https://github.com/mcv-m6-video/mcv-m6-2021-team6/blob/main/W5/M6_Final_Report.pdf)
